@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a focused VS Code integration capability
+title: "feature: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the editor workflow that is currently difficult.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Separate VS Code integration behavior from TOML language-core behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility considerations
+      description: Note VS Code, platform, setting, or tomlsmith-lsp compatibility effects.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched for an existing proposal.
+          required: true
+        - label: The requested behavior belongs in the VS Code adapter rather than the TomlSmith language core.
+          required: true

@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  extension:
+    name: VS Code extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check extension
+        run: pnpm typecheck
+
+      - name: Run extension tests
+        run: pnpm test
+
+      - name: Build extension
+        run: pnpm build
+
+  package:
+    name: Package installable Linux extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Read published server package
+        id: server
+        run: |
+          node -e "const pkg = require('./server-package.json'); if (pkg.crate !== 'tomlsmith-lsp' || !/^\\d+\\.\\d+\\.\\d+$/.test(pkg.version)) throw new Error('server-package.json must name an exact tomlsmith-lsp version')"
+          echo "crate=$(node -p 'require("./server-package.json").crate')" >> "${GITHUB_OUTPUT}"
+          echo "version=$(node -p 'require("./server-package.json").version')" >> "${GITHUB_OUTPUT}"
+
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.85.0 --profile minimal
+
+      - name: Install published language server
+        run: |
+          cargo +1.85.0 install "${{ steps.server.outputs.crate }}" \
+            --version "=${{ steps.server.outputs.version }}" \
+            --locked \
+            --root "${{ github.workspace }}/tomlsmith-server"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Stage language server
+        run: pnpm bundle-server --binary tomlsmith-server/bin/tomlsmith-lsp --platform linux --arch x64
+
+      - name: Test staged language server
+        run: pnpm exec vitest run test/server-package.test.ts
+        env:
+          TOMLSMITH_LSP_SMOKE_BINARY: tomlsmith-server/bin/tomlsmith-lsp
+
+      - name: Package VSIX
+        run: pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies --target linux-x64 -o tomlsmith-linux-x64.vsix
+
+      - name: Extract packaged VSIX
+        run: |
+          mkdir extracted-vsix
+          unzip -q tomlsmith-linux-x64.vsix -d extracted-vsix
+
+      - name: Test server extracted from VSIX
+        run: pnpm exec vitest run test/server-package.test.ts
+        env:
+          TOMLSMITH_LSP_SMOKE_BINARY: extracted-vsix/extension/server/linux-x64/tomlsmith-lsp
+
+      - name: Install VSIX in VS Code and receive server diagnostics
+        run: xvfb-run --auto-servernum pnpm exec vitest run test/vsix-install.test.ts
+        env:
+          TOMLSMITH_VSIX_E2E: tomlsmith-linux-x64.vsix
+          TOMLSMITH_VSCODE_VERSION: "1.95.0"
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: vsix-linux-x64
+          path: tomlsmith-linux-x64.vsix
+          retention-days: 7
+          if-no-files-found: error

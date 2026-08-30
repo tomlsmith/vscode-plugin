@@ -1,0 +1,212 @@
+{
+  "name": "tomlsmith",
+  "displayName": "TomlSmith",
+  "description": "TOML language support powered by the TomlSmith language server.",
+  "version": "0.0.1",
+  "publisher": "tomlsmith",
+  "author": "Nirvana-Jie <1357711537@qq.com>",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomlsmith/vscode-plugin.git"
+  },
+  "homepage": "https://github.com/tomlsmith/vscode-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/tomlsmith/vscode-plugin/issues"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "main": "./dist/extension.js",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#F4F7FB",
+    "theme": "light"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "TomlSmith needs to spawn the tomlsmith-lsp executable, which requires a real filesystem workspace."
+    },
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "restrictedConfigurations": [
+        "tomlsmith.server.path",
+        "tomlsmith.server.arguments",
+        "tomlsmith.server.environment"
+      ],
+      "description": "Restricted Mode ignores workspace overrides of the server launch settings."
+    }
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "toml",
+    "formatter",
+    "language-server",
+    "lsp"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "toml",
+        "aliases": [
+          "TOML",
+          "toml"
+        ],
+        "extensions": [
+          ".toml"
+        ],
+        "filenames": [
+          "Cargo.lock",
+          "Pipfile",
+          "uv.lock",
+          "poetry.lock",
+          "pdm.lock"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "toml",
+        "scopeName": "source.toml",
+        "path": "./syntaxes/toml.tmLanguage.json"
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "tomlDateTime",
+        "description": "TOML date, time, and date-time values reported by the TomlSmith language server."
+      },
+      {
+        "id": "tomlInvalid",
+        "description": "Invalid or unrecognized TOML syntax reported by the TomlSmith language server."
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "tomlDateTime": [
+            "constant.other.datetime.toml"
+          ],
+          "tomlInvalid": [
+            "invalid.illegal.toml"
+          ]
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "tomlsmith.restartServer",
+        "title": "TomlSmith: Restart Language Server"
+      }
+    ],
+    "configuration": {
+      "title": "TomlSmith",
+      "properties": {
+        "tomlsmith.server.path": {
+          "type": "string",
+          "default": "tomlsmith-lsp",
+          "scope": "machine-overridable",
+          "description": "Path or command name for tomlsmith-lsp. When not set explicitly, the extension prefers a server binary bundled with the extension and otherwise resolves tomlsmith-lsp from PATH. Changing this setting automatically restarts the language server."
+        },
+        "tomlsmith.server.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "window",
+          "description": "Additional arguments passed to tomlsmith-lsp. Changing this setting automatically restarts the language server."
+        },
+        "tomlsmith.server.environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "scope": "window",
+          "description": "Environment variables added when launching tomlsmith-lsp. Changing this setting automatically restarts the language server."
+        },
+        "tomlsmith.toml.version": {
+          "type": "string",
+          "enum": [
+            "1.0",
+            "1.1"
+          ],
+          "default": "1.0",
+          "scope": "window",
+          "description": "TOML language version used for validation and formatting. Both 1.0 and 1.1 are published specifications; 1.0 is the compatibility default for ecosystem files. Takes effect immediately without restarting the language server."
+        },
+        "tomlsmith.format.indentWidth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 16,
+          "default": null,
+          "scope": "window",
+          "description": "Indent width used by the formatter. When null the formatter follows the editor tab size."
+        },
+        "tomlsmith.format.lineWidth": {
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 320,
+          "default": 100,
+          "scope": "window",
+          "description": "Preferred line width used by the formatter."
+        },
+        "tomlsmith.format.lineEnding": {
+          "type": "string",
+          "enum": [
+            "preserve",
+            "lf",
+            "crlf"
+          ],
+          "default": "preserve",
+          "scope": "window",
+          "description": "Line-ending policy used by the formatter."
+        },
+        "tomlsmith.format.generatedFiles": {
+          "type": "string",
+          "enum": [
+            "skip",
+            "format"
+          ],
+          "default": "skip",
+          "scope": "window",
+          "description": "Whether Format Document touches generated files such as Cargo.lock, poetry.lock, pdm.lock, uv.lock, or files carrying an @generated marker."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node20 --external:vscode --outfile=dist/extension.js --sourcemap",
+    "bundle-server": "node scripts/bundle-server.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "vscode-languageclient": "10.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "1.95.0",
+    "@vscode/test-electron": "3.1.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.3.2"
+  }
+}

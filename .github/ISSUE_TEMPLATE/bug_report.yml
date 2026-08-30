@@ -1,0 +1,58 @@
+name: Bug report
+description: Report reproducible incorrect behavior in the TomlSmith VS Code extension
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Do not disclose security vulnerabilities here; use the private contact link instead.
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version or revision
+      placeholder: v0.x.y or git commit
+    validations:
+      required: true
+  - type: input
+    id: server-version
+    attributes:
+      label: tomlsmith-lsp version
+      placeholder: v0.x.y or unknown
+  - type: dropdown
+    id: toml-version
+    attributes:
+      label: TOML mode
+      options:
+        - TOML 1.0
+        - TOML 1.1
+        - Unknown or not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the TomlSmith output-channel logs when useful and remove private data.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the operating system, architecture, VS Code version, and server path source.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched for an existing report.
+          required: true
+        - label: This report does not contain a security vulnerability or private data.
+          required: true
