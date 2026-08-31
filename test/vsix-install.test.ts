@@ -24,13 +24,16 @@ interface E2eReport {
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
-  bundledServerPath: string;
   diagnosticCodes: string[];
   formattedText: string;
   languageId: string;
+  serverMode: "bundled" | "external";
+  serverPath: string;
 }
 
 const vsixFromEnvironment = process.env.TOMLSMITH_VSIX_E2E;
+const externalServerFromEnvironment =
+  process.env.TOMLSMITH_VSIX_EXTERNAL_SERVER;
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 
 function assertNoPathServer(): void {
@@ -42,12 +45,12 @@ function assertNoPathServer(): void {
     .find(existsSync);
   expect(
     pathServer,
-    "the e2e environment must not contain a PATH server; diagnostics must come from the VSIX binary",
+    "the e2e environment must not contain a PATH server; diagnostics must come from the selected test server",
   ).toBeUndefined();
 }
 
 test.skipIf(vsixFromEnvironment === undefined)(
-  "an isolated VS Code installs the platform VSIX and receives diagnostics from its bundled server",
+  "an isolated VS Code installs the VSIX and exercises its selected language server",
   async () => {
     if (vsixFromEnvironment === undefined) {
       throw new Error("TOMLSMITH_VSIX_E2E is required for this test");
@@ -55,6 +58,16 @@ test.skipIf(vsixFromEnvironment === undefined)(
     assertNoPathServer();
     const vsixPath = resolve(vsixFromEnvironment);
     expect(existsSync(vsixPath), `${vsixPath} must exist`).toBe(true);
+    const externalServerPath = externalServerFromEnvironment
+      ? resolve(externalServerFromEnvironment)
+      : undefined;
+    if (externalServerPath !== undefined) {
+      expect(
+        existsSync(externalServerPath),
+        `${externalServerPath} must exist`,
+      ).toBe(true);
+    }
+    const serverMode = externalServerPath === undefined ? "bundled" : "external";
     const manifest = JSON.parse(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
     ) as { name: string; publisher: string; version: string };
@@ -72,6 +85,7 @@ test.skipIf(vsixFromEnvironment === undefined)(
         mkdir(extensionsDirectory, { recursive: true }),
         mkdir(userDataDirectory, { recursive: true }),
         mkdir(workspaceDirectory, { recursive: true }),
+        mkdir(join(workspaceDirectory, ".vscode"), { recursive: true }),
         mkdir(driverDirectory, { recursive: true }),
       ]);
       await Promise.all([
@@ -79,6 +93,17 @@ test.skipIf(vsixFromEnvironment === undefined)(
         writeFile(
           join(workspaceDirectory, "format.toml"),
           "values=[\n1,\n]\n",
+          "utf8",
+        ),
+        writeFile(
+          join(workspaceDirectory, ".vscode", "settings.json"),
+          `${JSON.stringify(
+            externalServerPath === undefined
+              ? {}
+              : { "tomlsmith.server.path": externalServerPath },
+            null,
+            2,
+          )}\n`,
           "utf8",
         ),
         writeFile(
@@ -176,7 +201,9 @@ test.skipIf(vsixFromEnvironment === undefined)(
         extensionTestsPath: runnerPath,
         extensionTestsEnv: {
           TOMLSMITH_E2E_EXTENSIONS_DIR: extensionsDirectory,
+          TOMLSMITH_E2E_EXTERNAL_SERVER: externalServerPath ?? "",
           TOMLSMITH_E2E_REPORT: reportPath,
+          TOMLSMITH_E2E_SERVER_MODE: serverMode,
           TOMLSMITH_E2E_WORKSPACE: workspaceDirectory,
         },
         launchArgs: [workspaceDirectory, ...profileArguments, "--new-window"],
@@ -196,9 +223,14 @@ test.skipIf(vsixFromEnvironment === undefined)(
       expect(report.diagnosticCodes).toContain("parse.missing-equals");
       expect(report.formattedText).toBe("values = [\n  1,\n]\n");
       expect(report.extensionPath).toContain(extensionsDirectory);
-      expect(report.bundledServerPath).toContain(
-        join("server", `${process.platform}-${process.arch}`),
-      );
+      expect(report.serverMode).toBe(serverMode);
+      if (externalServerPath === undefined) {
+        expect(report.serverPath).toContain(
+          join("server", `${process.platform}-${process.arch}`),
+        );
+      } else {
+        expect(report.serverPath).toBe(externalServerPath);
+      }
     } finally {
       await rm(temporaryRoot, { recursive: true, force: true });
     }

@@ -9,10 +9,11 @@ interface E2eReport {
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
-  bundledServerPath: string;
   diagnosticCodes: string[];
   formattedText: string;
   languageId: string;
+  serverMode: "bundled" | "external";
+  serverPath: string;
 }
 
 function requiredEnvironment(name: string): string {
@@ -29,6 +30,22 @@ function diagnosticCode(diagnostic: vscode.Diagnostic): string {
     return String(code.value);
   }
   return String(code);
+}
+
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      return false;
+    }
+    throw error;
+  }
 }
 
 function isInside(parent: string, child: string): boolean {
@@ -91,6 +108,10 @@ export async function run(): Promise<void> {
     "TOMLSMITH_E2E_EXTENSIONS_DIR",
   );
   const reportPath = requiredEnvironment("TOMLSMITH_E2E_REPORT");
+  const serverMode = requiredEnvironment("TOMLSMITH_E2E_SERVER_MODE");
+  if (serverMode !== "bundled" && serverMode !== "external") {
+    throw new Error(`unsupported TOMLSMITH_E2E_SERVER_MODE: ${serverMode}`);
+  }
   const workspacePath = requiredEnvironment("TOMLSMITH_E2E_WORKSPACE");
   const extension = vscode.extensions.getExtension("tomlsmith.tomlsmith");
   if (extension === undefined) {
@@ -112,7 +133,27 @@ export async function run(): Promise<void> {
     `${process.platform}-${process.arch}`,
     executable,
   );
-  await access(bundledServerPath, constants.X_OK);
+  let serverPath: string;
+  if (serverMode === "bundled") {
+    await access(bundledServerPath, constants.X_OK);
+    serverPath = bundledServerPath;
+  } else {
+    if (await pathExists(bundledServerPath)) {
+      throw new Error(
+        `the universal VSIX unexpectedly contains a bundled server at ${bundledServerPath}`,
+      );
+    }
+    serverPath = resolve(requiredEnvironment("TOMLSMITH_E2E_EXTERNAL_SERVER"));
+    await access(serverPath, constants.X_OK);
+    const configuredServerPath = vscode.workspace
+      .getConfiguration("tomlsmith")
+      .get<string>("server.path");
+    if (configuredServerPath !== serverPath) {
+      throw new Error(
+        `expected tomlsmith.server.path to be ${serverPath}, received ${String(configuredServerPath)}`,
+      );
+    }
+  }
 
   await extension.activate();
   const document = await vscode.workspace.openTextDocument(
@@ -145,10 +186,11 @@ export async function run(): Promise<void> {
     extensionId: extension.id,
     extensionPath: installedExtensionPath,
     extensionVersion: String(extension.packageJSON.version),
-    bundledServerPath,
     diagnosticCodes: diagnostics.map(diagnosticCode),
     formattedText: formattingDocument.getText(),
     languageId: document.languageId,
+    serverMode,
+    serverPath,
   };
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 }

@@ -26,7 +26,9 @@ The extension registers TOML for `.toml` files and these filenames: `Cargo.lock`
 
 ## Set up the language server
 
-The platform-specific TomlSmith releases for macOS x64/arm64, non-Alpine Linux x64/arm64, and Windows x64 include a compatible `tomlsmith-lsp`; installing the matching VSIX requires no separate server setup. The same applies when VS Code installs the extension on the workspace side of a supported Remote-SSH, WSL, or Dev Container environment. Bundled packages do not cover Alpine or Windows Arm64, so those platforms must use an explicitly configured or `PATH` server.
+The Marketplace and GitHub Release provide platform-specific packages for macOS x64/arm64, non-Alpine Linux x64/arm64, and Windows x64. Each matching package includes a compatible `tomlsmith-lsp`, so no separate server setup is required. The same applies when VS Code installs the extension on the workspace side of a supported Remote-SSH, WSL, or Dev Container environment.
+
+The Marketplace also provides an untargeted universal fallback for environments not covered above, including Alpine and Windows Arm64. The fallback deliberately contains no executable; install `tomlsmith-lsp` from crates.io and configure it explicitly or make it available on `PATH` as described below.
 
 The extension talks to a `tomlsmith-lsp` executable, resolved in this order:
 

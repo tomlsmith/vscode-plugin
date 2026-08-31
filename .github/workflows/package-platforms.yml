@@ -28,47 +28,68 @@ jobs:
         include:
           - runner: macos-15
             target: darwin-arm64
+            bundled: true
             platform: darwin
             arch: arm64
             rust_target: aarch64-apple-darwin
             binary: tomlsmith-server/bin/tomlsmith-lsp
+            external_server: ""
             packaged_binary: extension/server/darwin-arm64/tomlsmith-lsp
             macos_deployment_target: "11.0"
             musl: false
           - runner: macos-15-intel
             target: darwin-x64
+            bundled: true
             platform: darwin
             arch: x64
             rust_target: x86_64-apple-darwin
             binary: tomlsmith-server/bin/tomlsmith-lsp
+            external_server: ""
             packaged_binary: extension/server/darwin-x64/tomlsmith-lsp
             macos_deployment_target: "10.15"
             musl: false
           - runner: ubuntu-24.04-arm
             target: linux-arm64
+            bundled: true
             platform: linux
             arch: arm64
             rust_target: aarch64-unknown-linux-musl
             binary: tomlsmith-server/bin/tomlsmith-lsp
+            external_server: ""
             packaged_binary: extension/server/linux-arm64/tomlsmith-lsp
             macos_deployment_target: ""
             musl: true
           - runner: ubuntu-24.04
             target: linux-x64
+            bundled: true
             platform: linux
             arch: x64
             rust_target: x86_64-unknown-linux-musl
             binary: tomlsmith-server/bin/tomlsmith-lsp
+            external_server: ""
             packaged_binary: extension/server/linux-x64/tomlsmith-lsp
             macos_deployment_target: ""
             musl: true
           - runner: windows-2025
             target: win32-x64
+            bundled: true
             platform: win32
             arch: x64
             rust_target: x86_64-pc-windows-msvc
             binary: tomlsmith-server/bin/tomlsmith-lsp.exe
+            external_server: ""
             packaged_binary: extension/server/win32-x64/tomlsmith-lsp.exe
+            macos_deployment_target: ""
+            musl: false
+          - runner: ubuntu-24.04
+            target: universal
+            bundled: false
+            platform: ""
+            arch: ""
+            rust_target: ""
+            binary: tomlsmith-server/bin/tomlsmith-lsp
+            external_server: tomlsmith-server/bin/tomlsmith-lsp
+            packaged_binary: ""
             macos_deployment_target: ""
             musl: false
     steps:
@@ -100,9 +121,15 @@ jobs:
           test "v${extension_version}" = "${GITHUB_REF_NAME}"
 
       - name: Install pinned Rust toolchain and target
+        if: ${{ matrix.bundled == true }}
         shell: bash
         run: |
           rustup toolchain install 1.85.0 --profile minimal --target "${{ matrix.rust_target }}"
+
+      - name: Install pinned Rust toolchain for the fallback test server
+        if: ${{ matrix.bundled == false }}
+        shell: bash
+        run: rustup toolchain install 1.85.0 --profile minimal
 
       - name: Install musl linker
         if: matrix.musl
@@ -111,7 +138,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes musl-tools
 
-      - name: Install published language server
+      - name: Install published language server for the target
+        if: ${{ matrix.bundled == true }}
         shell: bash
         env:
           MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_deployment_target }}
@@ -122,6 +150,15 @@ jobs:
             --target "${{ matrix.rust_target }}" \
             --root "${{ github.workspace }}/tomlsmith-server"
 
+      - name: Install published language server for the fallback test
+        if: ${{ matrix.bundled == false }}
+        shell: bash
+        run: |
+          cargo +1.85.0 install "${{ steps.server.outputs.crate }}" \
+            --version "=${{ steps.server.outputs.version }}" \
+            --locked \
+            --root "${{ github.workspace }}/tomlsmith-server"
+
       - name: Install extension dependencies
         run: pnpm install --frozen-lockfile
 
@@ -129,15 +166,22 @@ jobs:
         run: pnpm build
 
       - name: Stage language server
+        if: ${{ matrix.bundled == true }}
         run: pnpm bundle-server --binary ${{ matrix.binary }} --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
 
       - name: Test staged language server
+        if: ${{ matrix.bundled == true }}
         run: pnpm exec vitest run test/server-package.test.ts
         env:
           TOMLSMITH_LSP_SMOKE_BINARY: ${{ matrix.binary }}
 
       - name: Package platform VSIX
+        if: ${{ matrix.bundled == true }}
         run: pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies --target ${{ matrix.target }} -o tomlsmith-${{ matrix.target }}.vsix
+
+      - name: Package universal fallback VSIX
+        if: ${{ matrix.bundled == false }}
+        run: pnpm dlx @vscode/vsce@3.9.2 package --no-dependencies -o tomlsmith-${{ matrix.target }}.vsix
 
       - name: Extract packaged VSIX on Unix
         if: runner.os != 'Windows'
@@ -154,15 +198,22 @@ jobs:
           Expand-Archive "tomlsmith-${{ matrix.target }}.zip" -DestinationPath extracted-vsix
 
       - name: Test server extracted from VSIX
+        if: ${{ matrix.bundled == true }}
         run: pnpm exec vitest run test/server-package.test.ts
         env:
           TOMLSMITH_LSP_SMOKE_BINARY: extracted-vsix/${{ matrix.packaged_binary }}
+
+      - name: Verify universal fallback excludes a server binary
+        if: ${{ matrix.bundled == false }}
+        shell: bash
+        run: test ! -e extracted-vsix/extension/server
 
       - name: Install VSIX in VS Code and receive server diagnostics on Linux
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum pnpm exec vitest run test/vsix-install.test.ts
         env:
           TOMLSMITH_VSIX_E2E: tomlsmith-${{ matrix.target }}.vsix
+          TOMLSMITH_VSIX_EXTERNAL_SERVER: ${{ matrix.external_server }}
           TOMLSMITH_VSCODE_VERSION: "1.95.0"
 
       - name: Install VSIX in VS Code and receive server diagnostics
@@ -170,6 +221,7 @@ jobs:
         run: pnpm exec vitest run test/vsix-install.test.ts
         env:
           TOMLSMITH_VSIX_E2E: tomlsmith-${{ matrix.target }}.vsix
+          TOMLSMITH_VSIX_EXTERNAL_SERVER: ${{ matrix.external_server }}
           TOMLSMITH_VSCODE_VERSION: "1.95.0"
 
       - name: Upload VSIX artifact

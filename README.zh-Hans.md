@@ -26,7 +26,9 @@ TomlSmith for VS Code 使用 [TomlSmith](https://github.com/tomlsmith/tomlsmith)
 
 ## 配置语言服务器
 
-TomlSmith 面向 macOS x64/arm64、非 Alpine Linux x64/arm64 和 Windows x64 的分平台发行包都内置兼容的 `tomlsmith-lsp`；安装匹配的 VSIX 后不需要另外配置服务器。VS Code 在受支持的 Remote-SSH、WSL 或 Dev Container 环境中把扩展安装到工作区侧时也是如此。内置包不覆盖 Alpine 与 Windows Arm64，这些平台需要显式配置服务器路径，或使用 `PATH` 上的服务器。
+Marketplace 与 GitHub Release 为 macOS x64/arm64、非 Alpine Linux x64/arm64 和 Windows x64 提供分平台安装包。匹配的安装包都内置兼容的 `tomlsmith-lsp`，因此不需要另外配置服务器。VS Code 在受支持的 Remote-SSH、WSL 或 Dev Container 环境中把扩展安装到工作区侧时也是如此。
+
+Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）提供不指定平台的通用 fallback。这个 fallback 刻意不包含可执行文件；请按下文从 crates.io 安装 `tomlsmith-lsp`，并显式配置路径或让它出现在 `PATH` 中。
 
 扩展通过 `tomlsmith-lsp` 可执行文件工作，按以下顺序解析：
 

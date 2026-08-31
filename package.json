@@ -2,7 +2,7 @@
   "name": "tomlsmith",
   "displayName": "TomlSmith",
   "description": "TOML language support powered by the TomlSmith language server.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "tomlsmith",
   "author": "Nirvana-Jie <1357711537@qq.com>",
   "license": "MIT",
