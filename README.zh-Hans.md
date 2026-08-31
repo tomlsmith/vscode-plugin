@@ -10,9 +10,9 @@ TomlSmith for VS Code 使用 [TomlSmith](https://github.com/tomlsmith/tomlsmith)
 
 ## 主要功能
 
-- 编辑 TOML 文件时查看诊断。
+- 编辑 TOML 文件时查看错误与警告，并在 VS Code 的**问题**面板中看到稳定的诊断代码。
 - 使用 VS Code 的 **格式化文档** 操作。扩展会应用语言服务器返回的编辑，而不是替换整个文档。
-- 使用 TextMate 与语义 token 高亮键、值、表、注释和字面量。
+- 使用 TextMate 与语义 token 高亮键、值、表、注释和字面量；普通表、表数组、标量值键、数组值键和内联表值键具有不同分类。
 - 悬停时查看键路径和 TOML 值类型。
 - 浏览文档符号并折叠 TOML 结构。
 - 默认按 TOML 1.0 校验，也可以显式选择 TOML 1.1。
@@ -23,6 +23,24 @@ TomlSmith for VS Code 使用 [TomlSmith](https://github.com/tomlsmith/tomlsmith)
 ## 支持的文件
 
 扩展为 `.toml` 文件以及这些文件名注册 TOML：`Cargo.lock`、`Pipfile`、`uv.lock`、`poetry.lock` 和 `pdm.lock`。
+
+## 语法颜色
+
+TomlSmith 提供独立的 `tomlArrayKey`、`tomlTableKey` 语义 token 类型和对应的 TextMate scope，实际颜色由当前主题决定。如果主题把它们显示成相同颜色，可以只覆盖这些 TOML 专用 token：
+
+```json
+{
+  "editor.semanticTokenColorCustomizations": {
+    "rules": {
+      "tomlArrayKey": "#569CD6",
+      "tomlTableKey": "#4EC9B0",
+      "tomlDateTime": "#DCDCAA"
+    }
+  }
+}
+```
+
+数组分类覆盖数组值键和表数组表头；表分类覆盖内联表值键和普通表头。
 
 ## 配置语言服务器
 
@@ -41,7 +59,7 @@ Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）�
 1. 从 crates.io 安装精确的兼容版本：
 
    ```bash
-   cargo install tomlsmith-lsp --version '=0.1.0' --locked
+   cargo install tomlsmith-lsp --version '=0.2.0' --locked
    ```
 
 2. 让扩展找到它——保留 Cargo bin 目录在 `PATH` 中，或在设置中指定二进制路径：

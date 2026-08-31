@@ -9,7 +9,7 @@ These notes compare TomlSmith for VS Code with [Even Better TOML](https://market
 - A hierarchical document outline for tables, arrays of tables, and keys.
 - Folding for tables, arrays of tables, and multi-line arrays and inline tables.
 - Hover showing a key's dotted path and TOML value kind.
-- Semantic highlighting produced by the same parser that reports the diagnostics.
+- Semantic highlighting produced by the same parser that reports the diagnostics, with distinct table and array classifications for regular tables, arrays of tables, array-valued keys, and inline-table-valued keys. Exact colors remain controlled by the active VS Code theme.
 
 ## What Even Better TOML has that TomlSmith lacks
 

@@ -10,9 +10,9 @@ TomlSmith for VS Code uses [TomlSmith](https://github.com/tomlsmith/tomlsmith) f
 
 ## Features
 
-- View diagnostics while editing TOML files.
+- View errors and warnings while editing TOML files, with stable diagnostic codes in VS Code's **Problems** panel.
 - Format a document with VS Code's **Format Document** action. The extension applies the edits returned by the language server instead of replacing the whole document.
-- Highlight keys, values, tables, comments, and literals with TextMate and semantic tokens.
+- Highlight keys, values, tables, comments, and literals with TextMate and semantic tokens. Regular tables, arrays of tables, scalar keys, array-valued keys, and inline-table-valued keys receive distinct classifications.
 - View a key's path and TOML value kind on hover.
 - Navigate document symbols and fold TOML structures.
 - Validate as TOML 1.0 by default, or opt in to TOML 1.1 explicitly.
@@ -23,6 +23,24 @@ The extension does not provide completion, Schema integration, or code actions. 
 ## Supported files
 
 The extension registers TOML for `.toml` files and these filenames: `Cargo.lock`, `Pipfile`, `uv.lock`, `poetry.lock`, and `pdm.lock`.
+
+## Syntax colors
+
+TomlSmith exposes separate `tomlArrayKey` and `tomlTableKey` semantic token types and matching TextMate scopes. Your active color theme decides their exact colors. If a theme renders them alike, you can override only these TOML-specific token types:
+
+```json
+{
+  "editor.semanticTokenColorCustomizations": {
+    "rules": {
+      "tomlArrayKey": "#569CD6",
+      "tomlTableKey": "#4EC9B0",
+      "tomlDateTime": "#DCDCAA"
+    }
+  }
+}
+```
+
+The array classification covers array-valued keys and array-of-tables headers; the table classification covers inline-table-valued keys and regular table headers.
 
 ## Set up the language server
 
@@ -41,7 +59,7 @@ For extension development or an unsupported platform, if neither a bundled serve
 1. Install the exact compatible version from crates.io:
 
    ```bash
-   cargo install tomlsmith-lsp --version '=0.1.0' --locked
+   cargo install tomlsmith-lsp --version '=0.2.0' --locked
    ```
 
 2. Make it reachable — keep Cargo's bin directory on `PATH`, or point the setting at the binary:

@@ -4,12 +4,19 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import * as vscode from "vscode";
 
+interface E2eDiagnostic {
+  code: string;
+  message: string;
+  severity: "error" | "warning" | "information" | "hint";
+  source: string;
+}
+
 interface E2eReport {
+  diagnostics: E2eDiagnostic[];
   extensionActive: boolean;
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
-  diagnosticCodes: string[];
   formattedText: string;
   languageId: string;
   serverMode: "bundled" | "external";
@@ -30,6 +37,21 @@ function diagnosticCode(diagnostic: vscode.Diagnostic): string {
     return String(code.value);
   }
   return String(code);
+}
+
+function diagnosticSeverity(
+  severity: vscode.DiagnosticSeverity,
+): E2eDiagnostic["severity"] {
+  switch (severity) {
+    case vscode.DiagnosticSeverity.Error:
+      return "error";
+    case vscode.DiagnosticSeverity.Warning:
+      return "warning";
+    case vscode.DiagnosticSeverity.Information:
+      return "information";
+    case vscode.DiagnosticSeverity.Hint:
+      return "hint";
+  }
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -183,11 +205,16 @@ export async function run(): Promise<void> {
   }
 
   const report: E2eReport = {
+    diagnostics: diagnostics.map((diagnostic) => ({
+      code: diagnosticCode(diagnostic),
+      message: diagnostic.message,
+      severity: diagnosticSeverity(diagnostic.severity),
+      source: diagnostic.source ?? "",
+    })),
     extensionActive: extension.isActive,
     extensionId: extension.id,
     extensionPath: installedExtensionPath,
     extensionVersion: String(extension.packageJSON.version),
-    diagnosticCodes: diagnostics.map(diagnosticCode),
     formattedText: formattingDocument.getText(),
     languageId: document.languageId,
     serverMode,

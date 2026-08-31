@@ -2,6 +2,15 @@
 
 All notable user-facing changes to TomlSmith for VS Code are documented here.
 
+## [Unreleased]
+
+## [0.2.0] - 2026-08-31
+
+### Added
+
+- Distinct TextMate scopes and semantic token types for table headers, array-of-tables headers, array-valued keys, and inline-table-valued keys.
+- Release-package validation for the complete Problems diagnostic contract: Error severity, `tomlsmith` source, stable code, and a readable message.
+
 ## [0.1.0] - 2026-08-31
 
 ### Added
@@ -15,4 +24,6 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 - A universal Marketplace fallback for other platforms, using an explicitly configured or `PATH`-provided `tomlsmith-lsp`.
 - Migration notes for users moving from Even Better TOML.
 
+[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.2.0
 [0.1.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.1.0

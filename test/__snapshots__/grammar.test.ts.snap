@@ -6,7 +6,7 @@ exports[`TOML grammar tokenization > Cargo.lock package block 1`] = `
 line "# It is not intended for manual editing."
   "# It is not intended for manual editing." source.toml comment.line.number-sign.toml
 line "version = 4"
-  "version" source.toml variable.other.key.toml
+  "version" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -15,10 +15,10 @@ line ""
   "" source.toml
 line "[[package]]"
   "[[" source.toml meta.table.array.toml punctuation.definition.table.begin.toml
-  "package" source.toml meta.table.array.toml entity.name.type.table.toml
+  "package" source.toml meta.table.array.toml support.type.property-name.array.toml
   "]]" source.toml meta.table.array.toml punctuation.definition.table.end.toml
 line "name = \\"serde\\""
-  "name" source.toml variable.other.key.toml
+  "name" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -26,7 +26,7 @@ line "name = \\"serde\\""
   "serde" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "version = \\"1.0.219\\""
-  "version" source.toml variable.other.key.toml
+  "version" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -34,7 +34,7 @@ line "version = \\"1.0.219\\""
   "1.0.219" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "source = \\"registry+https://github.com/rust-lang/crates.io-index\\""
-  "source" source.toml variable.other.key.toml
+  "source" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -42,7 +42,7 @@ line "source = \\"registry+https://github.com/rust-lang/crates.io-index\\""
   "registry+https://github.com/rust-lang/crates.io-index" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "checksum = \\"5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6\\""
-  "checksum" source.toml variable.other.key.toml
+  "checksum" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -50,7 +50,7 @@ line "checksum = \\"5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb7
   "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "dependencies = ["
-  "dependencies" source.toml variable.other.key.toml
+  "dependencies" source.toml support.type.property-name.array.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -67,7 +67,7 @@ line "]"
 
 exports[`TOML grammar tokenization > bare, dotted, and quoted keys 1`] = `
 "line "name = \\"tomlsmith\\""
-  "name" source.toml variable.other.key.toml
+  "name" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -75,13 +75,13 @@ exports[`TOML grammar tokenization > bare, dotted, and quoted keys 1`] = `
   "tomlsmith" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "bare_key-2 = 1"
-  "bare_key-2" source.toml variable.other.key.toml
+  "bare_key-2" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1" source.toml constant.numeric.integer.toml
 line "physical.color = \\"orange\\""
-  "physical.color" source.toml variable.other.key.toml
+  "physical.color" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -89,13 +89,13 @@ line "physical.color = \\"orange\\""
   "orange" source.toml string.quoted.double.toml
   "\\"" source.toml string.quoted.double.toml
 line "site.\\"google.com\\" = true"
-  "site.\\"google.com\\"" source.toml variable.other.key.toml
+  "site.\\"google.com\\"" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "true" source.toml constant.language.boolean.toml
 line "'quoted key'.\\"another.one\\" = 2"
-  "'quoted key'.\\"another.one\\"" source.toml variable.other.key.toml
+  "'quoted key'.\\"another.one\\"" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -104,13 +104,13 @@ line "'quoted key'.\\"another.one\\" = 2"
 
 exports[`TOML grammar tokenization > booleans 1`] = `
 "line "enabled = true"
-  "enabled" source.toml variable.other.key.toml
+  "enabled" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "true" source.toml constant.language.boolean.toml
 line "disabled = false"
-  "disabled" source.toml variable.other.key.toml
+  "disabled" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -121,7 +121,7 @@ exports[`TOML grammar tokenization > comments and hash characters inside strings
 "line "# full-line comment"
   "# full-line comment" source.toml comment.line.number-sign.toml
 line "port = 8080 # trailing comment"
-  "port" source.toml variable.other.key.toml
+  "port" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -129,7 +129,7 @@ line "port = 8080 # trailing comment"
   " " source.toml
   "# trailing comment" source.toml comment.line.number-sign.toml
 line "path = \\"not # a comment\\" # actual comment"
-  "path" source.toml variable.other.key.toml
+  "path" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -139,7 +139,7 @@ line "path = \\"not # a comment\\" # actual comment"
   " " source.toml
   "# actual comment" source.toml comment.line.number-sign.toml
 line "literal_hash = '# not a comment either'"
-  "literal_hash" source.toml variable.other.key.toml
+  "literal_hash" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -150,43 +150,43 @@ line "literal_hash = '# not a comment either'"
 
 exports[`TOML grammar tokenization > date-times, dates, and times 1`] = `
 "line "offset_utc = 1979-05-27T07:32:00Z"
-  "offset_utc" source.toml variable.other.key.toml
+  "offset_utc" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1979-05-27T07:32:00Z" source.toml constant.other.datetime.toml
 line "offset_numeric = 1979-05-27T00:32:00.999999-07:00"
-  "offset_numeric" source.toml variable.other.key.toml
+  "offset_numeric" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1979-05-27T00:32:00.999999-07:00" source.toml constant.other.datetime.toml
 line "offset_space = 1979-05-27 07:32:00Z"
-  "offset_space" source.toml variable.other.key.toml
+  "offset_space" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1979-05-27 07:32:00Z" source.toml constant.other.datetime.toml
 line "local_date_time = 1979-05-27T07:32:00"
-  "local_date_time" source.toml variable.other.key.toml
+  "local_date_time" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1979-05-27T07:32:00" source.toml constant.other.datetime.toml
 line "local_date = 1979-05-27"
-  "local_date" source.toml variable.other.key.toml
+  "local_date" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1979-05-27" source.toml constant.other.datetime.toml
 line "local_time = 07:32:00"
-  "local_time" source.toml variable.other.key.toml
+  "local_time" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "07:32:00" source.toml constant.other.datetime.toml
 line "local_time_fractional = 00:32:00.999999"
-  "local_time_fractional" source.toml variable.other.key.toml
+  "local_time_fractional" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -195,61 +195,61 @@ line "local_time_fractional = 00:32:00.999999"
 
 exports[`TOML grammar tokenization > floats 1`] = `
 "line "pi = 3.1415"
-  "pi" source.toml variable.other.key.toml
+  "pi" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "3.1415" source.toml constant.numeric.float.toml
 line "negative = -0.01"
-  "negative" source.toml variable.other.key.toml
+  "negative" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "-0.01" source.toml constant.numeric.float.toml
 line "exponent = 5e+22"
-  "exponent" source.toml variable.other.key.toml
+  "exponent" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "5e+22" source.toml constant.numeric.float.toml
 line "upper_exponent = 1E6"
-  "upper_exponent" source.toml variable.other.key.toml
+  "upper_exponent" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1E6" source.toml constant.numeric.float.toml
 line "both = 6.626e-34"
-  "both" source.toml variable.other.key.toml
+  "both" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "6.626e-34" source.toml constant.numeric.float.toml
 line "grouped = 224_617.445_991_228"
-  "grouped" source.toml variable.other.key.toml
+  "grouped" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "224_617.445_991_228" source.toml constant.numeric.float.toml
 line "infinite = inf"
-  "infinite" source.toml variable.other.key.toml
+  "infinite" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "inf" source.toml constant.numeric.float.toml
 line "negative_infinity = -inf"
-  "negative_infinity" source.toml variable.other.key.toml
+  "negative_infinity" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "-inf" source.toml constant.numeric.float.toml
 line "not_a_number = nan"
-  "not_a_number" source.toml variable.other.key.toml
+  "not_a_number" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "nan" source.toml constant.numeric.float.toml
 line "signed_nan = +nan"
-  "signed_nan" source.toml variable.other.key.toml
+  "signed_nan" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -258,27 +258,27 @@ line "signed_nan = +nan"
 
 exports[`TOML grammar tokenization > inline tables and arrays 1`] = `
 "line "point = { x = 1, y = -2, label = \\"origin\\" }"
-  "point" source.toml variable.other.key.toml
+  "point" source.toml support.type.property-name.table.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "{" source.toml punctuation.definition.collection.toml
   " " source.toml
-  "x" source.toml variable.other.key.toml
+  "x" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1" source.toml constant.numeric.integer.toml
   "," source.toml punctuation.separator.toml
   " " source.toml
-  "y" source.toml variable.other.key.toml
+  "y" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "-2" source.toml constant.numeric.integer.toml
   "," source.toml punctuation.separator.toml
   " " source.toml
-  "label" source.toml variable.other.key.toml
+  "label" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -288,19 +288,19 @@ exports[`TOML grammar tokenization > inline tables and arrays 1`] = `
   " " source.toml
   "}" source.toml punctuation.definition.collection.toml
 line "nested = { inner = { list = [1, 2, 3] }, flag = true }"
-  "nested" source.toml variable.other.key.toml
+  "nested" source.toml support.type.property-name.table.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "{" source.toml punctuation.definition.collection.toml
   " " source.toml
-  "inner" source.toml variable.other.key.toml
+  "inner" source.toml support.type.property-name.table.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "{" source.toml punctuation.definition.collection.toml
   " " source.toml
-  "list" source.toml variable.other.key.toml
+  "list" source.toml support.type.property-name.array.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -317,7 +317,7 @@ line "nested = { inner = { list = [1, 2, 3] }, flag = true }"
   "}" source.toml punctuation.definition.collection.toml
   "," source.toml punctuation.separator.toml
   " " source.toml
-  "flag" source.toml variable.other.key.toml
+  "flag" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -325,7 +325,7 @@ line "nested = { inner = { list = [1, 2, 3] }, flag = true }"
   " " source.toml
   "}" source.toml punctuation.definition.collection.toml
 line "matrix = [[1, 2], [\\"a\\", 'b'], { key = \\"value\\" }]"
-  "matrix" source.toml variable.other.key.toml
+  "matrix" source.toml support.type.property-name.array.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -352,7 +352,7 @@ line "matrix = [[1, 2], [\\"a\\", 'b'], { key = \\"value\\" }]"
   " " source.toml
   "{" source.toml punctuation.definition.collection.toml
   " " source.toml
-  "key" source.toml variable.other.key.toml
+  "key" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -363,7 +363,7 @@ line "matrix = [[1, 2], [\\"a\\", 'b'], { key = \\"value\\" }]"
   "}" source.toml punctuation.definition.collection.toml
   "]" source.toml punctuation.definition.collection.toml
 line "moments = [2024-01-01, 07:32:00, 1979-05-27T07:32:00Z]"
-  "moments" source.toml variable.other.key.toml
+  "moments" source.toml support.type.property-name.array.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -380,49 +380,49 @@ line "moments = [2024-01-01, 07:32:00, 1979-05-27T07:32:00Z]"
 
 exports[`TOML grammar tokenization > integers 1`] = `
 "line "answer = 42"
-  "answer" source.toml variable.other.key.toml
+  "answer" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "42" source.toml constant.numeric.integer.toml
 line "negative = -17"
-  "negative" source.toml variable.other.key.toml
+  "negative" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "-17" source.toml constant.numeric.integer.toml
 line "plus = +99"
-  "plus" source.toml variable.other.key.toml
+  "plus" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "+99" source.toml constant.numeric.integer.toml
 line "zero = 0"
-  "zero" source.toml variable.other.key.toml
+  "zero" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "0" source.toml constant.numeric.integer.toml
 line "grouped = 1_000_000"
-  "grouped" source.toml variable.other.key.toml
+  "grouped" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "1_000_000" source.toml constant.numeric.integer.toml
 line "hex = 0xDEAD_beef"
-  "hex" source.toml variable.other.key.toml
+  "hex" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "0xDEAD_beef" source.toml constant.numeric.integer.toml
 line "octal = 0o755"
-  "octal" source.toml variable.other.key.toml
+  "octal" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "0o755" source.toml constant.numeric.integer.toml
 line "binary = 0b1101_0110"
-  "binary" source.toml variable.other.key.toml
+  "binary" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -431,13 +431,13 @@ line "binary = 0b1101_0110"
 
 exports[`TOML grammar tokenization > keys that resemble other token kinds 1`] = `
 "line "2024-01-01 = true"
-  "2024-01-01" source.toml variable.other.key.toml
+  "2024-01-01" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
   "true" source.toml constant.language.boolean.toml
 line "true = \\"not a boolean\\""
-  "true" source.toml variable.other.key.toml
+  "true" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -448,7 +448,7 @@ line "true = \\"not a boolean\\""
 
 exports[`TOML grammar tokenization > strings and escape sequences 1`] = `
 "line "basic = \\"hello \\\\\\"world\\\\\\"\\""
-  "basic" source.toml variable.other.key.toml
+  "basic" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -459,7 +459,7 @@ exports[`TOML grammar tokenization > strings and escape sequences 1`] = `
   "\\\\\\"" source.toml string.quoted.double.toml constant.character.escape.toml
   "\\"" source.toml string.quoted.double.toml
 line "escapes = \\"tab\\\\t newline\\\\n unicode \\\\u00E9 wide \\\\U0001F600 hex \\\\x41\\""
-  "escapes" source.toml variable.other.key.toml
+  "escapes" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -476,7 +476,7 @@ line "escapes = \\"tab\\\\t newline\\\\n unicode \\\\u00E9 wide \\\\U0001F600 he
   "\\\\x41" source.toml string.quoted.double.toml constant.character.escape.toml
   "\\"" source.toml string.quoted.double.toml
 line "literal = 'C:\\\\Users\\\\nodejs\\\\templates'"
-  "literal" source.toml variable.other.key.toml
+  "literal" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -484,7 +484,7 @@ line "literal = 'C:\\\\Users\\\\nodejs\\\\templates'"
   "C:\\\\Users\\\\nodejs\\\\templates" source.toml string.quoted.single.toml
   "'" source.toml string.quoted.single.toml
 line "multiline_basic = \\"\\"\\""
-  "multiline_basic" source.toml variable.other.key.toml
+  "multiline_basic" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -498,7 +498,7 @@ line "second line\\"\\"\\""
   "second line" source.toml string.quoted.double.block.toml
   "\\"\\"\\"" source.toml string.quoted.double.block.toml
 line "multiline_literal = '''"
-  "multiline_literal" source.toml variable.other.key.toml
+  "multiline_literal" source.toml support.type.property-name.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
@@ -512,30 +512,30 @@ line "'''"
 exports[`TOML grammar tokenization > table headers and array-of-tables headers 1`] = `
 "line "[server]"
   "[" source.toml meta.table.toml punctuation.definition.table.begin.toml
-  "server" source.toml meta.table.toml entity.name.type.table.toml
+  "server" source.toml meta.table.toml support.type.property-name.table.toml
   "]" source.toml meta.table.toml punctuation.definition.table.end.toml
 line "[dependencies.tokio]"
   "[" source.toml meta.table.toml punctuation.definition.table.begin.toml
-  "dependencies.tokio" source.toml meta.table.toml entity.name.type.table.toml
+  "dependencies.tokio" source.toml meta.table.toml support.type.property-name.table.toml
   "]" source.toml meta.table.toml punctuation.definition.table.end.toml
 line "[servers.\\"alpha.beta\\"]"
   "[" source.toml meta.table.toml punctuation.definition.table.begin.toml
-  "servers.\\"alpha.beta\\"" source.toml meta.table.toml entity.name.type.table.toml
+  "servers.\\"alpha.beta\\"" source.toml meta.table.toml support.type.property-name.table.toml
   "]" source.toml meta.table.toml punctuation.definition.table.end.toml
 line "['literal segment'.gamma]"
   "[" source.toml meta.table.toml punctuation.definition.table.begin.toml
-  "'literal segment'.gamma" source.toml meta.table.toml entity.name.type.table.toml
+  "'literal segment'.gamma" source.toml meta.table.toml support.type.property-name.table.toml
   "]" source.toml meta.table.toml punctuation.definition.table.end.toml
 line "[[bin]]"
   "[[" source.toml meta.table.array.toml punctuation.definition.table.begin.toml
-  "bin" source.toml meta.table.array.toml entity.name.type.table.toml
+  "bin" source.toml meta.table.array.toml support.type.property-name.array.toml
   "]]" source.toml meta.table.array.toml punctuation.definition.table.end.toml
 line "[[fruit.apple.variety]]"
   "[[" source.toml meta.table.array.toml punctuation.definition.table.begin.toml
-  "fruit.apple.variety" source.toml meta.table.array.toml entity.name.type.table.toml
+  "fruit.apple.variety" source.toml meta.table.array.toml support.type.property-name.array.toml
   "]]" source.toml meta.table.array.toml punctuation.definition.table.end.toml
 line "[[targets.\\"cfg(unix)\\".dependencies]]"
   "[[" source.toml meta.table.array.toml punctuation.definition.table.begin.toml
-  "targets.\\"cfg(unix)\\".dependencies" source.toml meta.table.array.toml entity.name.type.table.toml
+  "targets.\\"cfg(unix)\\".dependencies" source.toml meta.table.array.toml support.type.property-name.array.toml
   "]]" source.toml meta.table.array.toml punctuation.definition.table.end.toml"
 `;

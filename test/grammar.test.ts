@@ -59,6 +59,32 @@ function renderTokens(fixture: readonly string[]): string {
 }
 
 describe("TOML grammar tokenization", () => {
+  test("assigns distinct scopes to tables and collection-shaped keys", () => {
+    const rendered = renderTokens([
+      "[workspace]",
+      "scalar = 1",
+      "members = []",
+      "metadata = {}",
+      "[[bin]]",
+    ]);
+
+    expect(rendered).toContain(
+      '"workspace" source.toml meta.table.toml support.type.property-name.table.toml',
+    );
+    expect(rendered).toContain(
+      '"scalar" source.toml support.type.property-name.toml',
+    );
+    expect(rendered).toContain(
+      '"members" source.toml support.type.property-name.array.toml',
+    );
+    expect(rendered).toContain(
+      '"metadata" source.toml support.type.property-name.table.toml',
+    );
+    expect(rendered).toContain(
+      '"bin" source.toml meta.table.array.toml support.type.property-name.array.toml',
+    );
+  });
+
   test("table headers and array-of-tables headers", () => {
     expect(
       renderTokens([

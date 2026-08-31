@@ -8,7 +8,7 @@ Parser, formatter, diagnostic, and language-server behavior is owned by [TomlSmi
 
 ## Supported installation paths
 
-TomlSmith for VS Code 0.1.0 uses `tomlsmith-lsp` 0.1.0. Marketplace and GitHub Release packages for macOS x64/arm64, non-Alpine Linux x64/arm64, and Windows x64 bundle the server. The universal fallback does not bundle an executable; install the compatible server with `cargo install tomlsmith-lsp --version '=0.1.0' --locked`, then configure `tomlsmith.server.path` or expose the executable on `PATH`.
+TomlSmith for VS Code 0.2.0 uses `tomlsmith-lsp` 0.2.0. Marketplace and GitHub Release packages for macOS x64/arm64, non-Alpine Linux x64/arm64, and Windows x64 bundle the server. The universal fallback does not bundle an executable; install the compatible server with `cargo install tomlsmith-lsp --version '=0.2.0' --locked`, then configure `tomlsmith.server.path` or expose the executable on `PATH`.
 
 The minimum supported editor version is VS Code 1.95. Remote-SSH, WSL, and Dev Container installations are supported when VS Code can install the extension and run the server on the workspace side. Virtual workspaces are not supported because the language server needs a real filesystem and process.
 

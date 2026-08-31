@@ -20,12 +20,19 @@ import {
 import { build } from "esbuild";
 import { expect, test } from "vitest";
 
+interface E2eDiagnostic {
+  code: string;
+  message: string;
+  severity: "error" | "warning" | "information" | "hint";
+  source: string;
+}
+
 interface E2eReport {
+  diagnostics: E2eDiagnostic[];
   extensionActive: boolean;
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
-  diagnosticCodes: string[];
   formattedText: string;
   languageId: string;
   serverMode: "bundled" | "external";
@@ -244,7 +251,15 @@ test.skipIf(vsixFromEnvironment === undefined)(
         extensionVersion: manifest.version,
         languageId: "toml",
       });
-      expect(report.diagnosticCodes).toContain("parse.missing-equals");
+      const parseDiagnostic = report.diagnostics.find(
+        (diagnostic) => diagnostic.code === "parse.missing-equals",
+      );
+      expect(parseDiagnostic).toMatchObject({
+        code: "parse.missing-equals",
+        severity: "error",
+        source: "tomlsmith",
+      });
+      expect(parseDiagnostic?.message.trim()).not.toBe("");
       expect(report.formattedText).toBe("values = [\n  1,\n]\n");
       expect(report.extensionPath).toContain(
         await realpath(extensionsDirectory),

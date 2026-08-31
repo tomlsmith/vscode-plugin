@@ -28,7 +28,7 @@
           "match": "^(\\s*)(\\[\\[)\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(\\]\\])",
           "captures": {
             "2": { "name": "punctuation.definition.table.begin.toml" },
-            "3": { "name": "entity.name.type.table.toml" },
+            "3": { "name": "support.type.property-name.array.toml" },
             "4": { "name": "punctuation.definition.table.end.toml" }
           }
         },
@@ -37,7 +37,7 @@
           "match": "^(\\s*)(\\[)\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(\\])",
           "captures": {
             "2": { "name": "punctuation.definition.table.begin.toml" },
-            "3": { "name": "entity.name.type.table.toml" },
+            "3": { "name": "support.type.property-name.table.toml" },
             "4": { "name": "punctuation.definition.table.end.toml" }
           }
         }
@@ -46,9 +46,23 @@
     "keys": {
       "patterns": [
         {
+          "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)(?=\\s*\\[)",
+          "captures": {
+            "1": { "name": "support.type.property-name.array.toml" },
+            "2": { "name": "keyword.operator.assignment.toml" }
+          }
+        },
+        {
+          "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)(?=\\s*\\{)",
+          "captures": {
+            "1": { "name": "support.type.property-name.table.toml" },
+            "2": { "name": "keyword.operator.assignment.toml" }
+          }
+        },
+        {
           "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)",
           "captures": {
-            "1": { "name": "variable.other.key.toml" },
+            "1": { "name": "support.type.property-name.toml" },
             "2": { "name": "keyword.operator.assignment.toml" }
           }
         }
