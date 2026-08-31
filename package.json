@@ -84,16 +84,6 @@
     ],
     "semanticTokenTypes": [
       {
-        "id": "tomlArrayKey",
-        "superType": "variable",
-        "description": "TOML array-valued keys and array-of-tables headers reported by the TomlSmith language server."
-      },
-      {
-        "id": "tomlTableKey",
-        "superType": "variable",
-        "description": "TOML inline-table-valued keys and table headers reported by the TomlSmith language server."
-      },
-      {
         "id": "tomlDateTime",
         "description": "TOML date, time, and date-time values reported by the TomlSmith language server."
       },
@@ -104,12 +94,13 @@
     ],
     "semanticTokenScopes": [
       {
+        "language": "toml",
         "scopes": {
-          "tomlArrayKey": [
-            "support.type.property-name.array.toml"
+          "property": [
+            "variable.other.property.toml"
           ],
-          "tomlTableKey": [
-            "support.type.property-name.table.toml"
+          "namespace": [
+            "entity.name.namespace.toml"
           ],
           "tomlDateTime": [
             "constant.other.datetime.toml"

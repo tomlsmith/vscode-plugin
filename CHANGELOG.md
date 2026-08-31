@@ -8,7 +8,7 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ### Added
 
-- Distinct TextMate scopes and semantic token types for table headers, array-of-tables headers, array-valued keys, and inline-table-valued keys.
+- Theme-aware property and namespace scopes that visually distinguish keys from table and array-of-tables headers across TextMate and semantic highlighting.
 - Release-package validation for the complete Problems diagnostic contract: Error severity, `tomlsmith` source, stable code, and a readable message.
 
 ## [0.1.0] - 2026-08-31

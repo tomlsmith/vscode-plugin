@@ -59,29 +59,33 @@ function renderTokens(fixture: readonly string[]): string {
 }
 
 describe("TOML grammar tokenization", () => {
-  test("assigns distinct scopes to tables and collection-shaped keys", () => {
+  test("assigns distinct semantic scopes to keys and table headers", () => {
     const rendered = renderTokens([
       "[workspace]",
       "scalar = 1",
       "members = []",
       "metadata = {}",
+      "[profile.release]",
       "[[bin]]",
     ]);
 
     expect(rendered).toContain(
-      '"workspace" source.toml meta.table.toml support.type.property-name.table.toml',
+      '"workspace" source.toml meta.table.toml entity.name.section.toml entity.name.namespace.toml',
     );
     expect(rendered).toContain(
-      '"scalar" source.toml support.type.property-name.toml',
+      '"scalar" source.toml variable.other.property.toml',
     );
     expect(rendered).toContain(
-      '"members" source.toml support.type.property-name.array.toml',
+      '"members" source.toml variable.other.property.array.toml',
     );
     expect(rendered).toContain(
-      '"metadata" source.toml support.type.property-name.table.toml',
+      '"metadata" source.toml variable.other.property.table.toml',
     );
     expect(rendered).toContain(
-      '"bin" source.toml meta.table.array.toml support.type.property-name.array.toml',
+      '"profile.release" source.toml meta.table.toml entity.name.section.toml entity.name.namespace.toml',
+    );
+    expect(rendered).toContain(
+      '"bin" source.toml meta.table.array.toml entity.name.section.array.toml entity.name.namespace.toml',
     );
   });
 
