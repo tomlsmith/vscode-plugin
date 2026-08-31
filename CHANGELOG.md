@@ -4,6 +4,8 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-31
+
 ### Changed
 
 - TOML 1.1 is now the default language version for validation and formatting; strict TOML 1.0 remains available for files consumed by 1.0-only tools.
@@ -31,6 +33,7 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 - A universal Marketplace fallback for other platforms, using an explicitly configured or `PATH`-provided `tomlsmith-lsp`.
 - Migration notes for users moving from Even Better TOML.
 
-[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.2.0
 [0.1.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.1.0

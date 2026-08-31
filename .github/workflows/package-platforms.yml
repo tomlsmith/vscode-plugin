@@ -215,6 +215,7 @@ jobs:
           TOMLSMITH_VSIX_E2E: tomlsmith-${{ matrix.target }}.vsix
           TOMLSMITH_VSIX_EXTERNAL_SERVER: ${{ matrix.external_server }}
           TOMLSMITH_VSCODE_VERSION: "1.95.0"
+          TOMLSMITH_VSIX_EXPECT_SEMANTIC_MODIFIERS: "true"
 
       - name: Install VSIX in VS Code and exercise language features
         if: runner.os != 'Linux'
@@ -223,6 +224,7 @@ jobs:
           TOMLSMITH_VSIX_E2E: tomlsmith-${{ matrix.target }}.vsix
           TOMLSMITH_VSIX_EXTERNAL_SERVER: ${{ matrix.external_server }}
           TOMLSMITH_VSCODE_VERSION: "1.95.0"
+          TOMLSMITH_VSIX_EXPECT_SEMANTIC_MODIFIERS: "true"
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v7
