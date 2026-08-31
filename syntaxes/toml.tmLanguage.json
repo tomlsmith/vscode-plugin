@@ -6,6 +6,7 @@
     { "include": "#comments" },
     { "include": "#table-headers" },
     { "include": "#keys" },
+    { "include": "#inline-tables" },
     { "include": "#strings" },
     { "include": "#date-times" },
     { "include": "#numbers" },
@@ -72,6 +73,58 @@
           "captures": {
             "1": {
               "name": "variable.other.property.toml"
+            },
+            "2": { "name": "keyword.operator.assignment.toml" }
+          }
+        }
+      ]
+    },
+    "inline-tables": {
+      "name": "meta.inline-table.toml",
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.collection.begin.toml" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.collection.end.toml" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#inline-table-keys" },
+        { "include": "#inline-tables" },
+        { "include": "#strings" },
+        { "include": "#date-times" },
+        { "include": "#numbers" },
+        { "include": "#booleans" },
+        { "include": "#punctuation" }
+      ]
+    },
+    "inline-table-keys": {
+      "patterns": [
+        {
+          "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)(?=\\s*\\[)",
+          "captures": {
+            "1": {
+              "name": "variable.other.property.array.toml variable.other.property.inline-table-member.toml"
+            },
+            "2": { "name": "keyword.operator.assignment.toml" }
+          }
+        },
+        {
+          "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)(?=\\s*\\{)",
+          "captures": {
+            "1": {
+              "name": "variable.other.property.table.toml variable.other.property.inline-table-member.toml"
+            },
+            "2": { "name": "keyword.operator.assignment.toml" }
+          }
+        },
+        {
+          "match": "(?x)(?:^|(?<=[{,]))\\s*((?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*')(?:\\s*\\.\\s*(?:[A-Za-z0-9_-]+|\"(?:\\\\.|[^\"\\\\])*\"|'[^']*'))*)\\s*(=)",
+          "captures": {
+            "1": {
+              "name": "variable.other.property.inline-table-member.toml"
             },
             "2": { "name": "keyword.operator.assignment.toml" }
           }

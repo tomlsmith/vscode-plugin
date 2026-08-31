@@ -4,6 +4,13 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- TOML 1.1 is now the default language version for validation and formatting; strict TOML 1.0 remains available for files consumed by 1.0-only tools.
+- Dark+ now distinguishes inline-table member keys from their outer property keys by default across semantic and TextMate highlighting, with user and workspace color settings retaining precedence.
+- Expanded the installed-VSIX release gate to exercise real hover, folding, hierarchical document symbols, and symbol navigation in addition to diagnostics and formatting.
+- Added theme-safe TOML semantic modifiers and documented Dark+ color customization for scalar keys, array-valued keys, inline-table-valued keys, inline-table member keys, tables, arrays of tables, date-times, and invalid syntax.
+
 ## [0.2.0] - 2026-08-31
 
 ### Added

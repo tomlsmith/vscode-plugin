@@ -12,13 +12,14 @@ TomlSmith for VS Code uses [TomlSmith](https://github.com/tomlsmith/tomlsmith) f
 
 - View errors and warnings while editing TOML files, with stable diagnostic codes in VS Code's **Problems** panel.
 - Format a document with VS Code's **Format Document** action. The extension applies the edits returned by the language server instead of replacing the whole document.
-- Highlight keys, values, tables, comments, and literals with TextMate and semantic tokens. Regular tables, arrays of tables, scalar keys, array-valued keys, and inline-table-valued keys receive distinct classifications.
+- Highlight keys, values, tables, comments, and literals with TextMate and semantic tokens. Regular tables, arrays of tables, scalar keys, array-valued keys, inline-table-valued keys, and member keys inside inline tables receive distinct classifications.
 - View a key's path and TOML value kind on hover.
-- Navigate document symbols and fold TOML structures.
-- Validate as TOML 1.0 by default, or opt in to TOML 1.1 explicitly.
+- Browse a hierarchical symbol tree for tables, arrays of tables, and keys through **Outline**, breadcrumbs, and **Go to Symbol in Editor**, including documents whose tables are declared out of order.
+- Fold table regions, arrays of tables, multi-line arrays, and TOML 1.1 multi-line inline tables.
+- Validate as TOML 1.1 by default, or select strict TOML 1.0 for files consumed by 1.0-only tools.
 - Configure indentation, preferred line width, line endings, and whether generated files are formatted.
 
-The extension does not provide completion, Schema integration, or code actions. Switching from Even Better TOML? See the [migration notes](docs/even-better-toml.md).
+The extension does not provide rename refactors, completion, Schema integration, or code actions. Switching from Even Better TOML? See the [migration notes](docs/even-better-toml.md).
 
 ## Supported files
 
@@ -26,21 +27,36 @@ The extension registers TOML for `.toml` files and these filenames: `Cargo.lock`
 
 ## Syntax colors
 
-TomlSmith exposes separate `tomlArrayKey` and `tomlTableKey` semantic token types and matching TextMate scopes. Your active color theme decides their exact colors. If a theme renders them alike, you can override only these TOML-specific token types:
+TomlSmith keeps keys and table headers on VS Code's standard `property` and `namespace` semantic token types, then adds TOML-specific modifiers for array-valued keys, inline-table-valued keys, member keys inside inline tables, and arrays of tables. Themes therefore retain their normal fallback colors while you can override each TOML structure independently.
+
+With Dark+, TomlSmith gives inline-table member keys a cyan `#4FC1FF` default while outer property keys retain Dark+'s light blue and table headers retain its teal namespace color. The default is scoped to TOML and both the newer `Dark+` and older `Default Dark+` theme IDs; a user or workspace color setting still takes precedence. This example customizes the complete palette:
 
 ```json
 {
   "editor.semanticTokenColorCustomizations": {
-    "rules": {
-      "tomlArrayKey": "#569CD6",
-      "tomlTableKey": "#4EC9B0",
-      "tomlDateTime": "#DCDCAA"
+    "[Dark+][Default Dark+]": {
+      "enabled": true,
+      "rules": {
+        "property:toml": "#9CDCFE",
+        "property.tomlArray:toml": "#569CD6",
+        "property.tomlInlineTable:toml": "#9CDCFE",
+        "property.tomlInlineTableMember:toml": "#4FC1FF",
+        "property.tomlArray.tomlInlineTableMember:toml": "#4FC1FF",
+        "property.tomlInlineTable.tomlInlineTableMember:toml": "#4FC1FF",
+        "namespace:toml": "#4EC9B0",
+        "namespace.tomlArrayTable:toml": "#569CD6",
+        "tomlDateTime:toml": "#DCDCAA",
+        "tomlInvalid:toml": {
+          "foreground": "#F44747",
+          "underline": true
+        }
+      }
     }
   }
 }
 ```
 
-The array classification covers array-valued keys and array-of-tables headers; the table classification covers inline-table-valued keys and regular table headers.
+Remove the `[Dark+][Default Dark+]` wrapper and place `enabled` and `rules` directly under `editor.semanticTokenColorCustomizations` to apply the palette to every theme. Matching TextMate scopes provide the same structural fallback before the language server starts or when semantic highlighting is disabled. Use **Developer: Inspect Editor Tokens and Scopes** to inspect the selector and winning color rule at the cursor.
 
 ## Set up the language server
 
@@ -83,7 +99,7 @@ For extension source development, follow [CONTRIBUTING.md](CONTRIBUTING.md).
 | `tomlsmith.server.path` | `tomlsmith-lsp` | Restarts the server | Language-server command or absolute path; when not set explicitly, a bundled server binary is preferred over the `PATH` lookup |
 | `tomlsmith.server.arguments` | `[]` | Restarts the server | Additional arguments passed to `tomlsmith-lsp` |
 | `tomlsmith.server.environment` | `{}` | Restarts the server | Environment variables added when launching `tomlsmith-lsp` |
-| `tomlsmith.toml.version` | `1.0` | Immediately | TOML version used for diagnostics and formatting; both modes implement published specifications, while 1.0 is the compatibility default for ecosystem files and 1.1 is an explicit opt-in |
+| `tomlsmith.toml.version` | `1.1` | Immediately | TOML version used for diagnostics and formatting; select 1.0 explicitly only when the file must remain readable by a 1.0-only consumer |
 | `tomlsmith.format.indentWidth` | `null` | Immediately | Formatter indentation width; `null` follows the editor tab size |
 | `tomlsmith.format.lineWidth` | `100` | Immediately | Preferred formatter line width |
 | `tomlsmith.format.lineEnding` | `preserve` | Immediately | Preserve, LF, or CRLF line endings |
@@ -105,6 +121,10 @@ While a TOML file is open, a **TomlSmith** entry in the language status area (th
 ## Commands
 
 - **TomlSmith: Restart Language Server** — restart the current language-server process on demand.
+
+## Acknowledgements
+
+[Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml) and its [Taplo](https://github.com/tamasfe/taplo) language tooling helped establish the TOML editor experience users expect and informed TomlSmith's feature-gap checklist for folding, symbol navigation, refactoring, and Schema intelligence. TomlSmith is an independent implementation; thanks to Tamás Fehér and every Taplo contributor for advancing TOML tooling.
 
 ## Contributing
 

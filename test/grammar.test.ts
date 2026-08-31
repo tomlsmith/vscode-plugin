@@ -192,6 +192,37 @@ describe("TOML grammar tokenization", () => {
     ).toMatchSnapshot();
   });
 
+  test("inline table member keys retain their nested scope", () => {
+    const rendered = renderTokens([
+      'criterion = { version = "0.8.2", nested = { enabled = true } }',
+      "metadata = {",
+      '  owner = "team",',
+      "  options = {",
+      "    retries = 3,",
+      "  },",
+      "}",
+    ]);
+
+    expect(rendered).toContain(
+      '"criterion" source.toml variable.other.property.table.toml',
+    );
+    expect(rendered).toContain(
+      '"version" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml',
+    );
+    expect(rendered).toContain(
+      '"nested" source.toml meta.inline-table.toml variable.other.property.table.toml variable.other.property.inline-table-member.toml',
+    );
+    expect(rendered).toContain(
+      '"enabled" source.toml meta.inline-table.toml meta.inline-table.toml variable.other.property.inline-table-member.toml',
+    );
+    expect(rendered).toContain(
+      '"owner" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml',
+    );
+    expect(rendered).toContain(
+      '"retries" source.toml meta.inline-table.toml meta.inline-table.toml variable.other.property.inline-table-member.toml',
+    );
+  });
+
   test("comments and hash characters inside strings", () => {
     expect(
       renderTokens([

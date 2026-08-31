@@ -27,14 +27,48 @@ interface E2eDiagnostic {
   source: string;
 }
 
+interface E2eFoldingRange {
+  end: number;
+  kind: "comment" | "imports" | "region" | null;
+  start: number;
+}
+
+interface E2ePosition {
+  character: number;
+  line: number;
+}
+
+interface E2eDocumentSymbol {
+  children: E2eDocumentSymbol[];
+  kind: "array" | "namespace" | "property" | "other";
+  name: string;
+  selectionEnd: E2ePosition;
+  selectionStart: E2ePosition;
+}
+
+interface E2eSemanticTokenLegend {
+  tokenModifiers: string[];
+  tokenTypes: string[];
+}
+
 interface E2eReport {
+  declaredSemanticTokenModifiers: string[];
+  defaultVersionFormattedText: string;
   diagnostics: E2eDiagnostic[];
+  documentSymbols: E2eDocumentSymbol[];
   extensionActive: boolean;
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
+  foldingRanges: E2eFoldingRange[];
   formattedText: string;
+  hoverText: string;
+  inlineTableMemberDarkPlusColor: string | null;
+  inlineTableMemberDarkPlusTextMateColor: string | null;
   languageId: string;
+  navigationTarget: E2ePosition;
+  semanticTokenData: number[];
+  semanticTokenLegend: E2eSemanticTokenLegend;
   serverMode: "bundled" | "external";
   serverPath: string;
 }
@@ -42,6 +76,8 @@ interface E2eReport {
 const vsixFromEnvironment = process.env.TOMLSMITH_VSIX_E2E;
 const externalServerFromEnvironment =
   process.env.TOMLSMITH_VSIX_EXTERNAL_SERVER;
+const expectSemanticModifiers =
+  process.env.TOMLSMITH_VSIX_EXPECT_SEMANTIC_MODIFIERS === "true";
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 
 function assertNoPathServer(): void {
@@ -131,11 +167,29 @@ test.skipIf(vsixFromEnvironment === undefined)(
           "utf8",
         ),
         writeFile(
+          join(workspaceDirectory, "version.toml"),
+          'escape="\\e"\n',
+          "utf8",
+        ),
+        writeFile(
+          join(workspaceDirectory, "structure.toml"),
+          '[server]\nports = [\n  8000,\n  8001,\n]\n\n[server.tls]\nenabled = true\n',
+          "utf8",
+        ),
+        writeFile(
+          join(workspaceDirectory, "highlight.toml"),
+          'scalar = 1\narray = []\ninline = { version = "0.8.2" }\n\n[table]\nvalue = true\n\n[[array_table]]\nname = "one"\n',
+          "utf8",
+        ),
+        writeFile(
           join(userDataDirectory, "User", "settings.json"),
           `${JSON.stringify(
-            externalServerPath === undefined
-              ? {}
-              : { "tomlsmith.server.path": externalServerPath },
+            {
+              "workbench.colorTheme": "Default Dark+",
+              ...(externalServerPath === undefined
+                ? {}
+                : { "tomlsmith.server.path": externalServerPath }),
+            },
             null,
             2,
           )}\n`,
@@ -260,7 +314,79 @@ test.skipIf(vsixFromEnvironment === undefined)(
         source: "tomlsmith",
       });
       expect(parseDiagnostic?.message.trim()).not.toBe("");
+      expect(report.defaultVersionFormattedText).toBe('escape = "\\e"\n');
       expect(report.formattedText).toBe("values = [\n  1,\n]\n");
+      expect(report.foldingRanges).toEqual(
+        expect.arrayContaining([
+          { end: 7, kind: "region", start: 0 },
+          { end: 4, kind: "region", start: 1 },
+          { end: 7, kind: "region", start: 6 },
+        ]),
+      );
+      expect(report.documentSymbols).toEqual([
+        expect.objectContaining({
+          children: expect.arrayContaining([
+            expect.objectContaining({
+              kind: "property",
+              name: "ports",
+            }),
+            expect.objectContaining({
+              children: [
+                expect.objectContaining({
+                  kind: "property",
+                  name: "enabled",
+                }),
+              ],
+              kind: "namespace",
+              name: "tls",
+              selectionEnd: expect.objectContaining({ line: 6 }),
+              selectionStart: expect.objectContaining({ line: 6 }),
+            }),
+          ]),
+          kind: "namespace",
+          name: "server",
+          selectionEnd: expect.objectContaining({ line: 0 }),
+          selectionStart: expect.objectContaining({ line: 0 }),
+        }),
+      ]);
+      expect(report.navigationTarget).toEqual(
+        expect.objectContaining({ line: 6 }),
+      );
+      expect(report.hoverText).toContain("server.tls.enabled");
+      expect(report.hoverText).toContain("TOML");
+      expect(report.hoverText).toContain("boolean");
+      expect(report.inlineTableMemberDarkPlusColor).toBe("#4FC1FF");
+      expect(report.inlineTableMemberDarkPlusTextMateColor).toBe("#4FC1FF");
+      expect(report.declaredSemanticTokenModifiers).toEqual([
+        "tomlArray",
+        "tomlInlineTable",
+        "tomlArrayTable",
+        "tomlInlineTableMember",
+      ]);
+      expect(report.semanticTokenLegend.tokenTypes).toEqual([
+        "property",
+        "namespace",
+        "string",
+        "number",
+        "keyword",
+        "comment",
+        "operator",
+        "tomlDateTime",
+        "tomlInvalid",
+      ]);
+      expect(report.semanticTokenData.length).toBeGreaterThan(0);
+      expect(report.semanticTokenData.length % 5).toBe(0);
+      if (expectSemanticModifiers) {
+        expect(report.semanticTokenLegend.tokenModifiers).toEqual([
+          "tomlArray",
+          "tomlInlineTable",
+          "tomlArrayTable",
+          "tomlInlineTableMember",
+        ]);
+        expect(
+          report.semanticTokenData.filter((_, index) => index % 5 === 4),
+        ).toEqual(expect.arrayContaining([1, 2, 4, 8]));
+      }
       expect(report.extensionPath).toContain(
         await realpath(extensionsDirectory),
       );

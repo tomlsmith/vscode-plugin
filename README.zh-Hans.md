@@ -12,13 +12,14 @@ TomlSmith for VS Code 使用 [TomlSmith](https://github.com/tomlsmith/tomlsmith)
 
 - 编辑 TOML 文件时查看错误与警告，并在 VS Code 的**问题**面板中看到稳定的诊断代码。
 - 使用 VS Code 的 **格式化文档** 操作。扩展会应用语言服务器返回的编辑，而不是替换整个文档。
-- 使用 TextMate 与语义 token 高亮键、值、表、注释和字面量；普通表、表数组、标量值键、数组值键和内联表值键具有不同分类。
+- 使用 TextMate 与语义 token 高亮键、值、表、注释和字面量；普通表、表数组、标量值键、数组值键、内联表值键和内联表成员键具有不同分类。
 - 悬停时查看键路径和 TOML 值类型。
-- 浏览文档符号并折叠 TOML 结构。
-- 默认按 TOML 1.0 校验，也可以显式选择 TOML 1.1。
+- 通过**大纲**、面包屑和**转到编辑器中的符号**浏览由普通表、表数组和键组成的层级符号树，包括表声明顺序不规则的文档。
+- 折叠普通表、表数组、多行数组以及 TOML 1.1 多行内联表。
+- 默认按 TOML 1.1 校验；文件必须交给仅支持 1.0 的工具读取时，可以选择严格 TOML 1.0。
 - 配置缩进、首选行宽、换行符，以及是否格式化生成文件。
 
-扩展不提供补全、Schema 集成和代码操作。从 Even Better TOML 迁移？请参阅[迁移说明](docs/even-better-toml.md)。
+扩展暂不提供重命名重构、补全、Schema 集成和代码操作。从 Even Better TOML 迁移？请参阅[迁移说明](docs/even-better-toml.md)。
 
 ## 支持的文件
 
@@ -26,21 +27,36 @@ TomlSmith for VS Code 使用 [TomlSmith](https://github.com/tomlsmith/tomlsmith)
 
 ## 语法颜色
 
-TomlSmith 提供独立的 `tomlArrayKey`、`tomlTableKey` 语义 token 类型和对应的 TextMate scope，实际颜色由当前主题决定。如果主题把它们显示成相同颜色，可以只覆盖这些 TOML 专用 token：
+TomlSmith 继续使用 VS Code 标准的 `property` 和 `namespace` 语义 token 类型表示键与表头，并为数组值键、内联表值键、内联表成员键和表数组附加 TOML 专用 modifier。这样主题仍能继承标准颜色，同时用户可以单独覆盖每种 TOML 结构。
+
+使用 Dark+ 时，TomlSmith 默认把内联表成员键显示为青色 `#4FC1FF`，外层属性键继续使用 Dark+ 的浅蓝色，表头继续使用 namespace 的蓝绿色。该默认值只作用于 TOML，并同时匹配新名称 `Dark+` 和旧名称 `Default Dark+`；用户或工作区颜色设置仍然拥有更高优先级。下面的示例可以定制完整配色：
 
 ```json
 {
   "editor.semanticTokenColorCustomizations": {
-    "rules": {
-      "tomlArrayKey": "#569CD6",
-      "tomlTableKey": "#4EC9B0",
-      "tomlDateTime": "#DCDCAA"
+    "[Dark+][Default Dark+]": {
+      "enabled": true,
+      "rules": {
+        "property:toml": "#9CDCFE",
+        "property.tomlArray:toml": "#569CD6",
+        "property.tomlInlineTable:toml": "#9CDCFE",
+        "property.tomlInlineTableMember:toml": "#4FC1FF",
+        "property.tomlArray.tomlInlineTableMember:toml": "#4FC1FF",
+        "property.tomlInlineTable.tomlInlineTableMember:toml": "#4FC1FF",
+        "namespace:toml": "#4EC9B0",
+        "namespace.tomlArrayTable:toml": "#569CD6",
+        "tomlDateTime:toml": "#DCDCAA",
+        "tomlInvalid:toml": {
+          "foreground": "#F44747",
+          "underline": true
+        }
+      }
     }
   }
 }
 ```
 
-数组分类覆盖数组值键和表数组表头；表分类覆盖内联表值键和普通表头。
+如果希望对所有主题生效，可以去掉 `[Dark+][Default Dark+]` 包装，并把 `enabled` 和 `rules` 直接放到 `editor.semanticTokenColorCustomizations` 下。匹配的 TextMate scope 会在语言服务器尚未启动或语义高亮关闭时提供相同的结构化回退。可以通过 **Developer: Inspect Editor Tokens and Scopes** 查看光标位置实际使用的 selector 和最终生效的颜色规则。
 
 ## 配置语言服务器
 
@@ -83,7 +99,7 @@ Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）�
 | `tomlsmith.server.path` | `tomlsmith-lsp` | 重启服务器 | 语言服务器命令或绝对路径；未显式设置时，优先使用内置服务器二进制，然后才查找 `PATH` |
 | `tomlsmith.server.arguments` | `[]` | 重启服务器 | 传递给 `tomlsmith-lsp` 的附加参数 |
 | `tomlsmith.server.environment` | `{}` | 重启服务器 | 启动 `tomlsmith-lsp` 时附加的环境变量 |
-| `tomlsmith.toml.version` | `1.0` | 立即生效 | 诊断和格式化使用的 TOML 版本；1.0 与 1.1 都是已发布规范，1.0 是生态文件的兼容性默认值，1.1 需要显式选择 |
+| `tomlsmith.toml.version` | `1.1` | 立即生效 | 诊断和格式化使用的 TOML 版本；只有文件必须由仅支持 1.0 的消费端读取时才需要显式选择 1.0 |
 | `tomlsmith.format.indentWidth` | `null` | 立即生效 | 格式化缩进宽度；`null` 表示跟随编辑器的 tab 大小 |
 | `tomlsmith.format.lineWidth` | `100` | 立即生效 | 格式化首选行宽 |
 | `tomlsmith.format.lineEnding` | `preserve` | 立即生效 | 保留、LF 或 CRLF 换行符 |
@@ -105,6 +121,10 @@ Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）�
 ## 命令
 
 - **TomlSmith: Restart Language Server** — 按需重启当前语言服务器进程。
+
+## 致谢
+
+[Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml) 及其底层的 [Taplo](https://github.com/tamasfe/taplo) 语言工具帮助建立了用户对 TOML 编辑体验的预期，也启发了 TomlSmith 针对折叠、符号导航、重构和 Schema 智能所做的能力差距清单。TomlSmith 是独立实现；感谢 Tamás Fehér 与所有 Taplo 贡献者持续推进 TOML 工具生态。
 
 ## 参与贡献
 

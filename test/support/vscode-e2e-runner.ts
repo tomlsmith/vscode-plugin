@@ -11,14 +11,48 @@ interface E2eDiagnostic {
   source: string;
 }
 
+interface E2eFoldingRange {
+  end: number;
+  kind: "comment" | "imports" | "region" | null;
+  start: number;
+}
+
+interface E2ePosition {
+  character: number;
+  line: number;
+}
+
+interface E2eDocumentSymbol {
+  children: E2eDocumentSymbol[];
+  kind: "array" | "namespace" | "property" | "other";
+  name: string;
+  selectionEnd: E2ePosition;
+  selectionStart: E2ePosition;
+}
+
+interface E2eSemanticTokenLegend {
+  tokenModifiers: string[];
+  tokenTypes: string[];
+}
+
 interface E2eReport {
+  declaredSemanticTokenModifiers: string[];
+  defaultVersionFormattedText: string;
   diagnostics: E2eDiagnostic[];
+  documentSymbols: E2eDocumentSymbol[];
   extensionActive: boolean;
   extensionId: string;
   extensionPath: string;
   extensionVersion: string;
+  foldingRanges: E2eFoldingRange[];
   formattedText: string;
+  hoverText: string;
+  inlineTableMemberDarkPlusColor: string | null;
+  inlineTableMemberDarkPlusTextMateColor: string | null;
   languageId: string;
+  navigationTarget: E2ePosition;
+  semanticTokenData: number[];
+  semanticTokenLegend: E2eSemanticTokenLegend;
   serverMode: "bundled" | "external";
   serverPath: string;
 }
@@ -52,6 +86,109 @@ function diagnosticSeverity(
     case vscode.DiagnosticSeverity.Hint:
       return "hint";
   }
+}
+
+function foldingRangeKind(
+  kind: vscode.FoldingRangeKind | undefined,
+): E2eFoldingRange["kind"] {
+  switch (kind) {
+    case vscode.FoldingRangeKind.Comment:
+      return "comment";
+    case vscode.FoldingRangeKind.Imports:
+      return "imports";
+    case vscode.FoldingRangeKind.Region:
+      return "region";
+    default:
+      return null;
+  }
+}
+
+function symbolKind(kind: vscode.SymbolKind): E2eDocumentSymbol["kind"] {
+  switch (kind) {
+    case vscode.SymbolKind.Array:
+      return "array";
+    case vscode.SymbolKind.Namespace:
+      return "namespace";
+    case vscode.SymbolKind.Property:
+      return "property";
+    default:
+      return "other";
+  }
+}
+
+function position(position: vscode.Position): E2ePosition {
+  return { character: position.character, line: position.line };
+}
+
+function isDocumentSymbol(
+  symbol: vscode.DocumentSymbol | vscode.SymbolInformation,
+): symbol is vscode.DocumentSymbol {
+  return "selectionRange" in symbol;
+}
+
+function documentSymbol(symbol: vscode.DocumentSymbol): E2eDocumentSymbol {
+  return {
+    children: symbol.children.map(documentSymbol),
+    kind: symbolKind(symbol.kind),
+    name: symbol.name,
+    selectionEnd: position(symbol.selectionRange.end),
+    selectionStart: position(symbol.selectionRange.start),
+  };
+}
+
+function objectProperty(value: unknown, key: string): unknown {
+  if (typeof value !== "object" || value === null || !(key in value)) {
+    return undefined;
+  }
+  return value[key as keyof typeof value];
+}
+
+function semanticTokenColor(
+  customizations: unknown,
+  themeSelector: string,
+  tokenSelector: string,
+): string | null {
+  const rules = objectProperty(
+    objectProperty(customizations, themeSelector),
+    "rules",
+  );
+  const color = objectProperty(rules, tokenSelector);
+  if (typeof color === "string") {
+    return color;
+  }
+  const foreground = objectProperty(color, "foreground");
+  return typeof foreground === "string" ? foreground : null;
+}
+
+function textMateScopeColor(
+  customizations: unknown,
+  themeSelector: string,
+  expectedScope: string,
+): string | null {
+  const rules = objectProperty(
+    objectProperty(customizations, themeSelector),
+    "textMateRules",
+  );
+  if (!Array.isArray(rules)) {
+    return null;
+  }
+  for (const rule of rules) {
+    const scope = objectProperty(rule, "scope");
+    const matches =
+      scope === expectedScope ||
+      (Array.isArray(scope) && scope.includes(expectedScope));
+    if (!matches) {
+      continue;
+    }
+    const foreground = objectProperty(
+      objectProperty(rule, "settings"),
+      "foreground",
+    );
+    if (typeof foreground === "string") {
+      return foreground;
+    }
+  }
+  return null;
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -140,6 +277,24 @@ export async function run(): Promise<void> {
   if (extension === undefined) {
     throw new Error(`the packaged ${expectedExtensionId} extension is not installed`);
   }
+  const semanticTokenModifierContributions: unknown =
+    extension.packageJSON.contributes?.semanticTokenModifiers;
+  if (!Array.isArray(semanticTokenModifierContributions)) {
+    throw new Error("the installed extension declares no semantic token modifiers");
+  }
+  const declaredSemanticTokenModifiers = semanticTokenModifierContributions.map(
+    (contribution: unknown) => {
+      if (
+        typeof contribution !== "object" ||
+        contribution === null ||
+        !("id" in contribution) ||
+        typeof contribution.id !== "string"
+      ) {
+        throw new Error("the installed extension has a malformed semantic token modifier");
+      }
+      return contribution.id;
+    },
+  );
 
   const installedExtensionPath = await realpath(extension.extensionPath);
   const installedExtensionsDirectory = await realpath(expectedExtensionsDirectory);
@@ -203,20 +358,129 @@ export async function run(): Promise<void> {
   if (!(await vscode.workspace.applyEdit(formattingEdit))) {
     throw new Error("VS Code rejected the formatting edits returned by TomlSmith");
   }
+  const versionDocument = await vscode.workspace.openTextDocument(
+    vscode.Uri.file(join(workspacePath, "version.toml")),
+  );
+  const versionEdits = await vscode.commands.executeCommand<vscode.TextEdit[]>(
+    "vscode.executeFormatDocumentProvider",
+    versionDocument.uri,
+    { insertSpaces: true, tabSize: 2 },
+  );
+  if (versionEdits === undefined || versionEdits.length === 0) {
+    throw new Error(
+      "the installed extension did not format TOML 1.1-only syntax by default",
+    );
+  }
+  const versionEdit = new vscode.WorkspaceEdit();
+  versionEdit.set(versionDocument.uri, versionEdits);
+  if (!(await vscode.workspace.applyEdit(versionEdit))) {
+    throw new Error("VS Code rejected the TOML 1.1 default formatting edits");
+  }
+  const structureDocument = await vscode.workspace.openTextDocument(
+    vscode.Uri.file(join(workspacePath, "structure.toml")),
+  );
+  const highlightDocument = await vscode.workspace.openTextDocument(
+    vscode.Uri.file(join(workspacePath, "highlight.toml")),
+  );
+  const semanticTokenColorCustomizations = vscode.workspace
+    .getConfiguration("editor", highlightDocument)
+    .get<unknown>("semanticTokenColorCustomizations");
+  const tokenColorCustomizations = vscode.workspace
+    .getConfiguration("editor", highlightDocument)
+    .get<unknown>("tokenColorCustomizations");
+  const semanticTokenLegend = await vscode.commands.executeCommand<
+    vscode.SemanticTokensLegend
+  >("vscode.provideDocumentSemanticTokensLegend", highlightDocument.uri);
+  if (semanticTokenLegend === undefined) {
+    throw new Error("the installed extension returned no TOML semantic token legend");
+  }
+  const semanticTokens = await vscode.commands.executeCommand<vscode.SemanticTokens>(
+    "vscode.provideDocumentSemanticTokens",
+    highlightDocument.uri,
+  );
+  if (semanticTokens === undefined || semanticTokens.data.length === 0) {
+    throw new Error("the installed extension returned no TOML semantic tokens");
+  }
+  const foldingRanges = await vscode.commands.executeCommand<
+    vscode.FoldingRange[]
+  >("vscode.executeFoldingRangeProvider", structureDocument.uri);
+  if (foldingRanges === undefined || foldingRanges.length === 0) {
+    throw new Error("the installed extension returned no TOML folding ranges");
+  }
+  const symbols = await vscode.commands.executeCommand<
+    Array<vscode.DocumentSymbol | vscode.SymbolInformation>
+  >("vscode.executeDocumentSymbolProvider", structureDocument.uri);
+  if (symbols === undefined || symbols.length === 0) {
+    throw new Error("the installed extension returned no TOML document symbols");
+  }
+  if (!symbols.every(isDocumentSymbol)) {
+    throw new Error("VS Code did not receive hierarchical TOML document symbols");
+  }
+  const serverSymbol = symbols.find((symbol) => symbol.name === "server");
+  const tlsSymbol = serverSymbol?.children.find(
+    (symbol) => symbol.name === "tls",
+  );
+  if (tlsSymbol === undefined) {
+    throw new Error("the TOML symbol tree did not contain server.tls");
+  }
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    structureDocument.uri,
+    new vscode.Position(7, 2),
+  );
+  if (hovers === undefined || hovers.length === 0) {
+    throw new Error("the installed extension returned no TOML hover information");
+  }
+  const hoverText = hovers
+    .flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+  if (hoverText === "") {
+    throw new Error("the installed extension returned an empty TOML hover");
+  }
+  const navigationEditor = await vscode.window.showTextDocument(
+    structureDocument,
+    { selection: tlsSymbol.selectionRange },
+  );
 
   const report: E2eReport = {
+    declaredSemanticTokenModifiers,
+    defaultVersionFormattedText: versionDocument.getText(),
     diagnostics: diagnostics.map((diagnostic) => ({
       code: diagnosticCode(diagnostic),
       message: diagnostic.message,
       severity: diagnosticSeverity(diagnostic.severity),
       source: diagnostic.source ?? "",
     })),
+    documentSymbols: symbols.map(documentSymbol),
     extensionActive: extension.isActive,
     extensionId: extension.id,
     extensionPath: installedExtensionPath,
     extensionVersion: String(extension.packageJSON.version),
+    foldingRanges: foldingRanges.map((range) => ({
+      end: range.end,
+      kind: foldingRangeKind(range.kind),
+      start: range.start,
+    })),
     formattedText: formattingDocument.getText(),
+    hoverText,
+    inlineTableMemberDarkPlusColor: semanticTokenColor(
+      semanticTokenColorCustomizations,
+      "[Dark+][Default Dark+]",
+      "property.tomlInlineTableMember:toml",
+    ),
+    inlineTableMemberDarkPlusTextMateColor: textMateScopeColor(
+      tokenColorCustomizations,
+      "[Dark+][Default Dark+]",
+      "variable.other.property.inline-table-member.toml",
+    ),
     languageId: document.languageId,
+    navigationTarget: position(navigationEditor.selection.start),
+    semanticTokenData: Array.from(semanticTokens.data),
+    semanticTokenLegend: {
+      tokenModifiers: [...semanticTokenLegend.tokenModifiers],
+      tokenTypes: [...semanticTokenLegend.tokenTypes],
+    },
     serverMode,
     serverPath,
   };

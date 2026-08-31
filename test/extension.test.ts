@@ -128,7 +128,7 @@ test("the VS Code adapter applies the contract defaults when no settings are con
     tomlVersion: string;
     format: Record<string, unknown>;
   };
-  expect(options.tomlVersion).toBe("1.0");
+  expect(options.tomlVersion).toBe("1.1");
   expect("indentWidth" in options.format).toBe(false);
   expect(options.format).toEqual({
     lineWidth: 100,

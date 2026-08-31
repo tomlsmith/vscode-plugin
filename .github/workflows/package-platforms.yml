@@ -208,7 +208,7 @@ jobs:
         shell: bash
         run: test ! -e extracted-vsix/extension/server
 
-      - name: Install VSIX in VS Code and receive server diagnostics on Linux
+      - name: Install VSIX in VS Code and exercise language features on Linux
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum pnpm exec vitest run test/vsix-install.test.ts
         env:
@@ -216,7 +216,7 @@ jobs:
           TOMLSMITH_VSIX_EXTERNAL_SERVER: ${{ matrix.external_server }}
           TOMLSMITH_VSCODE_VERSION: "1.95.0"
 
-      - name: Install VSIX in VS Code and receive server diagnostics
+      - name: Install VSIX in VS Code and exercise language features
         if: runner.os != 'Linux'
         run: pnpm exec vitest run test/vsix-install.test.ts
         env:

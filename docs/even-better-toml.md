@@ -4,7 +4,7 @@ These notes compare TomlSmith for VS Code with [Even Better TOML](https://market
 
 ## What TomlSmith for VS Code has today
 
-- Version-aware diagnostics: documents are validated as TOML 1.0 by default, and `tomlsmith.toml.version` switches validation and formatting to TOML 1.1 without a server restart.
+- Version-aware diagnostics: documents are validated as TOML 1.1 by default, and `tomlsmith.toml.version` switches validation and formatting to strict TOML 1.0 without a server restart when a legacy consumer requires it.
 - A formatter that applies minimal edits instead of rewriting the whole document, refuses to format a document with syntax errors (logging the refusal instead of showing a popup), and by default skips generated files such as `Cargo.lock` or files marked `@generated`.
 - A hierarchical document outline for tables, arrays of tables, and keys.
 - Folding for tables, arrays of tables, and multi-line arrays and inline tables.
@@ -14,10 +14,15 @@ These notes compare TomlSmith for VS Code with [Even Better TOML](https://market
 ## What Even Better TOML has that TomlSmith lacks
 
 - JSON Schema support backed by the schema store: schema-driven completion, validation, and hover documentation.
+- Schema-provided document links.
+- Rename refactors.
 - Code actions.
 - Key sorting during formatting.
+- JSON-to-TOML and TOML-to-JSON conversion commands.
 
 If your workflow depends on schema-backed completion or validation for files such as `pyproject.toml`, keep Even Better TOML for now.
+
+TomlSmith is an independent implementation. This comparison and TomlSmith's capability planning benefited from the feature inventory and editor experience documented by [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml) and [Taplo](https://github.com/tamasfe/taplo); thank you to their maintainers and contributors.
 
 ## Running both extensions
 

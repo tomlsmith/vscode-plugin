@@ -104,7 +104,7 @@ jobs:
         env:
           TOMLSMITH_LSP_SMOKE_BINARY: extracted-vsix/extension/server/linux-x64/tomlsmith-lsp
 
-      - name: Install VSIX in VS Code and receive server diagnostics
+      - name: Install VSIX in VS Code and exercise language features
         run: xvfb-run --auto-servernum pnpm exec vitest run test/vsix-install.test.ts
         env:
           TOMLSMITH_VSIX_E2E: tomlsmith-linux-x64.vsix

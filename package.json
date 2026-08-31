@@ -92,6 +92,24 @@
         "description": "Invalid or unrecognized TOML syntax reported by the TomlSmith language server."
       }
     ],
+    "semanticTokenModifiers": [
+      {
+        "id": "tomlArray",
+        "description": "TOML keys whose values are arrays."
+      },
+      {
+        "id": "tomlInlineTable",
+        "description": "TOML keys whose values are inline tables."
+      },
+      {
+        "id": "tomlArrayTable",
+        "description": "TOML array-of-tables headers."
+      },
+      {
+        "id": "tomlInlineTableMember",
+        "description": "TOML key segments declared inside inline tables."
+      }
+    ],
     "semanticTokenScopes": [
       {
         "language": "toml",
@@ -99,8 +117,20 @@
           "property": [
             "variable.other.property.toml"
           ],
+          "property.tomlArray": [
+            "variable.other.property.array.toml"
+          ],
+          "property.tomlInlineTable": [
+            "variable.other.property.table.toml"
+          ],
+          "property.tomlInlineTableMember": [
+            "variable.other.property.inline-table-member.toml"
+          ],
           "namespace": [
             "entity.name.namespace.toml"
+          ],
+          "namespace.tomlArrayTable": [
+            "entity.name.section.array.toml"
           ],
           "tomlDateTime": [
             "constant.other.datetime.toml"
@@ -111,6 +141,29 @@
         }
       }
     ],
+    "configurationDefaults": {
+      "[toml]": {
+        "editor.semanticTokenColorCustomizations": {
+          "[Dark+][Default Dark+]": {
+            "rules": {
+              "property.tomlInlineTableMember:toml": "#4FC1FF"
+            }
+          }
+        },
+        "editor.tokenColorCustomizations": {
+          "[Dark+][Default Dark+]": {
+            "textMateRules": [
+              {
+                "scope": "variable.other.property.inline-table-member.toml",
+                "settings": {
+                  "foreground": "#4FC1FF"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
     "commands": [
       {
         "command": "tomlsmith.restartServer",
@@ -150,9 +203,9 @@
             "1.0",
             "1.1"
           ],
-          "default": "1.0",
+          "default": "1.1",
           "scope": "window",
-          "description": "TOML language version used for validation and formatting. Both 1.0 and 1.1 are published specifications; 1.0 is the compatibility default for ecosystem files. Takes effect immediately without restarting the language server."
+          "description": "TOML language version used for validation and formatting. TOML 1.1 is the default and accepts TOML 1.0 documents; select 1.0 explicitly for files consumed by 1.0-only tools. Takes effect immediately without restarting the language server."
         },
         "tomlsmith.format.indentWidth": {
           "type": [

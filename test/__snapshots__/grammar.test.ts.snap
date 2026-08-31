@@ -262,68 +262,68 @@ exports[`TOML grammar tokenization > inline tables and arrays 1`] = `
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
-  "{" source.toml punctuation.definition.collection.toml
-  " " source.toml
-  "x" source.toml variable.other.property.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "1" source.toml constant.numeric.integer.toml
-  "," source.toml punctuation.separator.toml
-  " " source.toml
-  "y" source.toml variable.other.property.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "-2" source.toml constant.numeric.integer.toml
-  "," source.toml punctuation.separator.toml
-  " " source.toml
-  "label" source.toml variable.other.property.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "\\"" source.toml string.quoted.double.toml
-  "origin" source.toml string.quoted.double.toml
-  "\\"" source.toml string.quoted.double.toml
-  " " source.toml
-  "}" source.toml punctuation.definition.collection.toml
+  "{" source.toml meta.inline-table.toml punctuation.definition.collection.begin.toml
+  " " source.toml meta.inline-table.toml
+  "x" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "1" source.toml meta.inline-table.toml constant.numeric.integer.toml
+  "," source.toml meta.inline-table.toml punctuation.separator.toml
+  " " source.toml meta.inline-table.toml
+  "y" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "-2" source.toml meta.inline-table.toml constant.numeric.integer.toml
+  "," source.toml meta.inline-table.toml punctuation.separator.toml
+  " " source.toml meta.inline-table.toml
+  "label" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "\\"" source.toml meta.inline-table.toml string.quoted.double.toml
+  "origin" source.toml meta.inline-table.toml string.quoted.double.toml
+  "\\"" source.toml meta.inline-table.toml string.quoted.double.toml
+  " " source.toml meta.inline-table.toml
+  "}" source.toml meta.inline-table.toml punctuation.definition.collection.end.toml
 line "nested = { inner = { list = [1, 2, 3] }, flag = true }"
   "nested" source.toml variable.other.property.table.toml
   " " source.toml
   "=" source.toml keyword.operator.assignment.toml
   " " source.toml
-  "{" source.toml punctuation.definition.collection.toml
-  " " source.toml
-  "inner" source.toml variable.other.property.table.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "{" source.toml punctuation.definition.collection.toml
-  " " source.toml
-  "list" source.toml variable.other.property.array.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "[" source.toml punctuation.definition.collection.toml
-  "1" source.toml constant.numeric.integer.toml
-  "," source.toml punctuation.separator.toml
-  " " source.toml
-  "2" source.toml constant.numeric.integer.toml
-  "," source.toml punctuation.separator.toml
-  " " source.toml
-  "3" source.toml constant.numeric.integer.toml
-  "]" source.toml punctuation.definition.collection.toml
-  " " source.toml
-  "}" source.toml punctuation.definition.collection.toml
-  "," source.toml punctuation.separator.toml
-  " " source.toml
-  "flag" source.toml variable.other.property.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "true" source.toml constant.language.boolean.toml
-  " " source.toml
-  "}" source.toml punctuation.definition.collection.toml
+  "{" source.toml meta.inline-table.toml punctuation.definition.collection.begin.toml
+  " " source.toml meta.inline-table.toml
+  "inner" source.toml meta.inline-table.toml variable.other.property.table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "{" source.toml meta.inline-table.toml meta.inline-table.toml punctuation.definition.collection.begin.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "list" source.toml meta.inline-table.toml meta.inline-table.toml variable.other.property.array.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "[" source.toml meta.inline-table.toml meta.inline-table.toml punctuation.definition.collection.toml
+  "1" source.toml meta.inline-table.toml meta.inline-table.toml constant.numeric.integer.toml
+  "," source.toml meta.inline-table.toml meta.inline-table.toml punctuation.separator.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "2" source.toml meta.inline-table.toml meta.inline-table.toml constant.numeric.integer.toml
+  "," source.toml meta.inline-table.toml meta.inline-table.toml punctuation.separator.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "3" source.toml meta.inline-table.toml meta.inline-table.toml constant.numeric.integer.toml
+  "]" source.toml meta.inline-table.toml meta.inline-table.toml punctuation.definition.collection.toml
+  " " source.toml meta.inline-table.toml meta.inline-table.toml
+  "}" source.toml meta.inline-table.toml meta.inline-table.toml punctuation.definition.collection.end.toml
+  "," source.toml meta.inline-table.toml punctuation.separator.toml
+  " " source.toml meta.inline-table.toml
+  "flag" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "true" source.toml meta.inline-table.toml constant.language.boolean.toml
+  " " source.toml meta.inline-table.toml
+  "}" source.toml meta.inline-table.toml punctuation.definition.collection.end.toml
 line "matrix = [[1, 2], [\\"a\\", 'b'], { key = \\"value\\" }]"
   "matrix" source.toml variable.other.property.array.toml
   " " source.toml
@@ -350,17 +350,17 @@ line "matrix = [[1, 2], [\\"a\\", 'b'], { key = \\"value\\" }]"
   "]" source.toml punctuation.definition.collection.toml
   "," source.toml punctuation.separator.toml
   " " source.toml
-  "{" source.toml punctuation.definition.collection.toml
-  " " source.toml
-  "key" source.toml variable.other.property.toml
-  " " source.toml
-  "=" source.toml keyword.operator.assignment.toml
-  " " source.toml
-  "\\"" source.toml string.quoted.double.toml
-  "value" source.toml string.quoted.double.toml
-  "\\"" source.toml string.quoted.double.toml
-  " " source.toml
-  "}" source.toml punctuation.definition.collection.toml
+  "{" source.toml meta.inline-table.toml punctuation.definition.collection.begin.toml
+  " " source.toml meta.inline-table.toml
+  "key" source.toml meta.inline-table.toml variable.other.property.inline-table-member.toml
+  " " source.toml meta.inline-table.toml
+  "=" source.toml meta.inline-table.toml keyword.operator.assignment.toml
+  " " source.toml meta.inline-table.toml
+  "\\"" source.toml meta.inline-table.toml string.quoted.double.toml
+  "value" source.toml meta.inline-table.toml string.quoted.double.toml
+  "\\"" source.toml meta.inline-table.toml string.quoted.double.toml
+  " " source.toml meta.inline-table.toml
+  "}" source.toml meta.inline-table.toml punctuation.definition.collection.end.toml
   "]" source.toml punctuation.definition.collection.toml
 line "moments = [2024-01-01, 07:32:00, 1979-05-27T07:32:00Z]"
   "moments" source.toml variable.other.property.array.toml

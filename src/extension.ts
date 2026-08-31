@@ -61,7 +61,7 @@ function readSettings(): ExtensionSettings {
     ),
     tomlVersion: configuration.get<ExtensionSettings["tomlVersion"]>(
       "toml.version",
-      "1.0",
+      "1.1",
     ),
     format: {
       indentWidth: indentWidth ?? undefined,
