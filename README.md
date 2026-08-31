@@ -56,10 +56,10 @@ The extension talks to a `tomlsmith-lsp` executable, resolved in this order:
 
 For extension development or an unsupported platform, if neither a bundled server binary nor one on `PATH` is available, install the published server crate:
 
-1. Install the exact compatible version from crates.io:
+1. Install the latest stable server from crates.io:
 
    ```bash
-   cargo install tomlsmith-lsp --version '=0.2.0' --locked
+   cargo install tomlsmith-lsp --locked
    ```
 
 2. Make it reachable — keep Cargo's bin directory on `PATH`, or point the setting at the binary:

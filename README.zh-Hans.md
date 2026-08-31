@@ -56,10 +56,10 @@ Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）�
 
 进行扩展开发或使用内置包不覆盖的平台时，如果既没有内置服务器二进制、`PATH` 上也找不到，可以安装正式发布的 server crate：
 
-1. 从 crates.io 安装精确的兼容版本：
+1. 从 crates.io 安装最新稳定版服务器：
 
    ```bash
-   cargo install tomlsmith-lsp --version '=0.2.0' --locked
+   cargo install tomlsmith-lsp --locked
    ```
 
 2. 让扩展找到它——保留 Cargo bin 目录在 `PATH` 中，或在设置中指定二进制路径：
