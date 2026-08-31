@@ -4,6 +4,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  realpath,
   rm,
   writeFile,
 } from "node:fs/promises";
@@ -49,6 +50,33 @@ function assertNoPathServer(): void {
   ).toBeUndefined();
 }
 
+async function resolveVSCodeExecutable(): Promise<string> {
+  const configuredExecutable = process.env.TOMLSMITH_VSCODE_EXECUTABLE;
+  if (configuredExecutable !== undefined && configuredExecutable !== "") {
+    return configuredExecutable;
+  }
+
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      return await downloadAndUnzipVSCode({
+        cachePath: join(repositoryRoot, ".vscode-test"),
+        version: process.env.TOMLSMITH_VSCODE_VERSION ?? "1.95.0",
+      });
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        await new Promise((resolveDelay) =>
+          setTimeout(resolveDelay, attempt * 2_000),
+        );
+      }
+    }
+  }
+  throw new Error("unable to download VS Code after three attempts", {
+    cause: lastError,
+  });
+}
+
 test.skipIf(vsixFromEnvironment === undefined)(
   "an isolated VS Code installs the VSIX and exercises its selected language server",
   async () => {
@@ -84,8 +112,8 @@ test.skipIf(vsixFromEnvironment === undefined)(
       await Promise.all([
         mkdir(extensionsDirectory, { recursive: true }),
         mkdir(userDataDirectory, { recursive: true }),
+        mkdir(join(userDataDirectory, "User"), { recursive: true }),
         mkdir(workspaceDirectory, { recursive: true }),
-        mkdir(join(workspaceDirectory, ".vscode"), { recursive: true }),
         mkdir(driverDirectory, { recursive: true }),
       ]);
       await Promise.all([
@@ -96,7 +124,7 @@ test.skipIf(vsixFromEnvironment === undefined)(
           "utf8",
         ),
         writeFile(
-          join(workspaceDirectory, ".vscode", "settings.json"),
+          join(userDataDirectory, "User", "settings.json"),
           `${JSON.stringify(
             externalServerPath === undefined
               ? {}
@@ -140,12 +168,7 @@ test.skipIf(vsixFromEnvironment === undefined)(
         target: "node20",
       });
 
-      const vscodeExecutablePath =
-        process.env.TOMLSMITH_VSCODE_EXECUTABLE ??
-        (await downloadAndUnzipVSCode({
-          cachePath: join(repositoryRoot, ".vscode-test"),
-          version: process.env.TOMLSMITH_VSCODE_VERSION ?? "1.95.0",
-        }));
+      const vscodeExecutablePath = await resolveVSCodeExecutable();
       const [cliPath, ...cliPrefixArguments] =
         resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath, {
           reuseMachineInstall: true,
@@ -222,7 +245,9 @@ test.skipIf(vsixFromEnvironment === undefined)(
       });
       expect(report.diagnosticCodes).toContain("parse.missing-equals");
       expect(report.formattedText).toBe("values = [\n  1,\n]\n");
-      expect(report.extensionPath).toContain(extensionsDirectory);
+      expect(report.extensionPath).toContain(
+        await realpath(extensionsDirectory),
+      );
       expect(report.serverMode).toBe(serverMode);
       if (externalServerPath === undefined) {
         expect(report.serverPath).toContain(
