@@ -216,7 +216,7 @@ test.skipIf(vsixFromEnvironment === undefined)(
       expect(installed.error).toBeUndefined();
       expect(installed.status, installed.stderr).toBe(0);
       expect(installed.stdout.split(/\r?\n/)).toContain(
-        `${expectedExtensionId}@${manifest.version}`,
+        `${expectedExtensionId.toLowerCase()}@${manifest.version}`,
       );
 
       const exitCode = await runTests({
@@ -224,6 +224,7 @@ test.skipIf(vsixFromEnvironment === undefined)(
         extensionTestsPath: runnerPath,
         extensionTestsEnv: {
           TOMLSMITH_E2E_EXTENSIONS_DIR: extensionsDirectory,
+          TOMLSMITH_E2E_EXTENSION_ID: expectedExtensionId,
           TOMLSMITH_E2E_EXTERNAL_SERVER: externalServerPath ?? "",
           TOMLSMITH_E2E_REPORT: reportPath,
           TOMLSMITH_E2E_SERVER_MODE: serverMode,

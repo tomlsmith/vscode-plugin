@@ -107,15 +107,16 @@ export async function run(): Promise<void> {
   const expectedExtensionsDirectory = requiredEnvironment(
     "TOMLSMITH_E2E_EXTENSIONS_DIR",
   );
+  const expectedExtensionId = requiredEnvironment("TOMLSMITH_E2E_EXTENSION_ID");
   const reportPath = requiredEnvironment("TOMLSMITH_E2E_REPORT");
   const serverMode = requiredEnvironment("TOMLSMITH_E2E_SERVER_MODE");
   if (serverMode !== "bundled" && serverMode !== "external") {
     throw new Error(`unsupported TOMLSMITH_E2E_SERVER_MODE: ${serverMode}`);
   }
   const workspacePath = requiredEnvironment("TOMLSMITH_E2E_WORKSPACE");
-  const extension = vscode.extensions.getExtension("tomlsmith.tomlsmith");
+  const extension = vscode.extensions.getExtension(expectedExtensionId);
   if (extension === undefined) {
-    throw new Error("the packaged tomlsmith.tomlsmith extension is not installed");
+    throw new Error(`the packaged ${expectedExtensionId} extension is not installed`);
   }
 
   const installedExtensionPath = await realpath(extension.extensionPath);
