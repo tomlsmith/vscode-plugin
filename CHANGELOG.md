@@ -4,6 +4,12 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-01
+
+### Fixed
+
+- Platform-specific packages now bundle `tomlsmith-lsp` 0.3.1, fixing formatter blank-line and inline-table layout normalization and keeping table folding ranges from consuming trailing comments.
+
 ## [0.3.0] - 2026-08-31
 
 ### Changed
@@ -33,7 +39,8 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 - A universal Marketplace fallback for other platforms, using an explicitly configured or `PATH`-provided `tomlsmith-lsp`.
 - Migration notes for users moving from Even Better TOML.
 
-[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.2.0
 [0.1.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.1.0
