@@ -4,6 +4,13 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-03
+
+### Changed
+
+- Platform-specific packages now bundle `tomlsmith-lsp` 0.4.0, whose formatter lays out inline tables in a single pass: arrays inside expanded inline tables wrap at their real columns, an inline-table array element that fits on a fresh line starts one, and a comma-first entry after a comment keeps its indentation. Formatting a large TOML 1.1 document is up to fifty times faster than 0.3.1 and uses less memory than 0.2.0.
+- Reformatting an open document reuses the token tape produced for semantic highlighting, so format-on-save of a large file no longer re-lexes it.
+
 ## [0.3.1] - 2026-09-01
 
 ### Fixed
@@ -39,7 +46,8 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 - A universal Marketplace fallback for other platforms, using an explicitly configured or `PATH`-provided `tomlsmith-lsp`.
 - Migration notes for users moving from Even Better TOML.
 
-[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tomlsmith/vscode-plugin/releases/tag/v0.2.0
