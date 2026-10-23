@@ -60,6 +60,8 @@ Remove the `[Dark+][Default Dark+]` wrapper and place `enabled` and `rules` dire
 
 ## Set up the language server
 
+Version 0.4.1 packages use `tomlsmith-lsp` 0.4.1, improving long-line semantic highlighting and repeated array-of-tables analysis. Formatting with `preserve` follows the first physical line ending without changing string literal bytes.
+
 The Marketplace and GitHub Release provide platform-specific packages for macOS x64/arm64, non-Alpine Linux x64/arm64, and Windows x64. Each matching package includes a compatible `tomlsmith-lsp`, so no separate server setup is required. The same applies when VS Code installs the extension on the workspace side of a supported Remote-SSH, WSL, or Dev Container environment.
 
 The Marketplace also provides an untargeted universal fallback for environments not covered above, including Alpine and Windows Arm64. The fallback deliberately contains no executable; install `tomlsmith-lsp` from crates.io and configure it explicitly or make it available on `PATH` as described below.

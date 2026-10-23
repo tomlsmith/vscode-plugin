@@ -60,6 +60,8 @@ TomlSmith 继续使用 VS Code 标准的 `property` 和 `namespace` 语义 token
 
 ## 配置语言服务器
 
+0.4.1 版本使用 `tomlsmith-lsp` 0.4.1，改善长行语义高亮和重复数组表的分析性能。格式化的 `preserve` 策略遵循第一个实际换行符，并保留字符串字面量的原始字节。
+
 Marketplace 与 GitHub Release 为 macOS x64/arm64、非 Alpine Linux x64/arm64 和 Windows x64 提供分平台安装包。匹配的安装包都内置兼容的 `tomlsmith-lsp`，因此不需要另外配置服务器。VS Code 在受支持的 Remote-SSH、WSL 或 Dev Container 环境中把扩展安装到工作区侧时也是如此。
 
 Marketplace 还为上述范围外的环境（包括 Alpine 与 Windows Arm64）提供不指定平台的通用 fallback。这个 fallback 刻意不包含可执行文件；请按下文从 crates.io 安装 `tomlsmith-lsp`，并显式配置路径或让它出现在 `PATH` 中。

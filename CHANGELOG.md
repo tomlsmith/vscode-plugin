@@ -4,6 +4,13 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-23
+
+### Fixed
+
+- Platform-specific packages now bundle `tomlsmith-lsp` 0.4.1, which keeps long-line semantic-token position conversion and repeated array-of-tables analysis scalable.
+- The formatter now preserves the first physical line ending in mixed-newline files while retaining the exact bytes of string literals.
+
 ## [0.4.0] - 2026-09-03
 
 ### Changed
@@ -46,7 +53,8 @@ All notable user-facing changes to TomlSmith for VS Code are documented here.
 - A universal Marketplace fallback for other platforms, using an explicitly configured or `PATH`-provided `tomlsmith-lsp`.
 - Migration notes for users moving from Even Better TOML.
 
-[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/tomlsmith/vscode-plugin/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/tomlsmith/vscode-plugin/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/tomlsmith/vscode-plugin/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/tomlsmith/vscode-plugin/compare/v0.2.0...v0.3.0
