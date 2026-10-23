@@ -55,6 +55,7 @@ interface E2eReport {
   semanticTokenLegend: E2eSemanticTokenLegend;
   serverMode: "bundled" | "external";
   serverPath: string;
+  vscodeVersion: string;
 }
 
 function requiredEnvironment(name: string): string {
@@ -444,6 +445,7 @@ export async function run(): Promise<void> {
   );
 
   const report: E2eReport = {
+    vscodeVersion: vscode.version,
     declaredSemanticTokenModifiers,
     defaultVersionFormattedText: versionDocument.getText(),
     diagnostics: diagnostics.map((diagnostic) => ({

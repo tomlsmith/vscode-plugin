@@ -34,6 +34,8 @@ CI and release packaging read `server-package.json` and install that exact `toml
 
 The install-level check is a Vitest test and can be reproduced for a platform package with `TOMLSMITH_VSIX_E2E=/absolute/path/to/tomlsmith-<target>.vsix pnpm exec vitest run test/vsix-install.test.ts`. For a universal package, also set `TOMLSMITH_VSIX_EXTERNAL_SERVER=/absolute/path/to/tomlsmith-lsp`. Set `TOMLSMITH_VSCODE_EXECUTABLE` to an existing VS Code executable to avoid downloading the minimum supported version.
 
+After publishing to Marketplace, run `TOMLSMITH_MARKETPLACE_E2E=true TOMLSMITH_VSIX_EXPECT_SEMANTIC_MODIFIERS=true pnpm exec vitest run test/vsix-install.test.ts` without `TOMLSMITH_VSIX_E2E`. This installs the exact extension ID and version declared in `package.json` through the real Marketplace into an isolated profile, checks the installed server version, and exercises the same language features. Set `TOMLSMITH_VSCODE_VERSION=stable` to also verify the current stable editor, and optionally set `TOMLSMITH_E2E_RESULT_PATH` to retain the passing installation and feature report outside the temporary profile.
+
 ## Adapter boundary
 
 The extension owns VS Code activation, settings, commands, language registration, process launch, and language-client lifecycle. It must not parse TOML, reinterpret diagnostics, reproduce formatter rules, or depend on source files inside the [core repository](https://github.com/tomlsmith/tomlsmith).

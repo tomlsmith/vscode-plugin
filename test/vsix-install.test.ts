@@ -9,7 +9,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { delimiter, join, resolve } from "node:path";
+import { delimiter, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -71,9 +71,11 @@ interface E2eReport {
   semanticTokenLegend: E2eSemanticTokenLegend;
   serverMode: "bundled" | "external";
   serverPath: string;
+  vscodeVersion: string;
 }
 
 const vsixFromEnvironment = process.env.TOMLSMITH_VSIX_E2E;
+const marketplaceInstallation = process.env.TOMLSMITH_MARKETPLACE_E2E === "true";
 const externalServerFromEnvironment =
   process.env.TOMLSMITH_VSIX_EXTERNAL_SERVER;
 const expectSemanticModifiers =
@@ -120,15 +122,13 @@ async function resolveVSCodeExecutable(): Promise<string> {
   });
 }
 
-test.skipIf(vsixFromEnvironment === undefined)(
-  "an isolated VS Code installs the VSIX and exercises its selected language server",
+test.skipIf(vsixFromEnvironment === undefined && !marketplaceInstallation)(
+  `an isolated VS Code installs ${marketplaceInstallation ? "from Marketplace" : "the VSIX"} and exercises its selected language server`,
   async () => {
-    if (vsixFromEnvironment === undefined) {
-      throw new Error("TOMLSMITH_VSIX_E2E is required for this test");
+    if (marketplaceInstallation && vsixFromEnvironment !== undefined) {
+      throw new Error("select either Marketplace or a local VSIX installation");
     }
     assertNoPathServer();
-    const vsixPath = resolve(vsixFromEnvironment);
-    expect(existsSync(vsixPath), `${vsixPath} must exist`).toBe(true);
     const externalServerPath = externalServerFromEnvironment
       ? resolve(externalServerFromEnvironment)
       : undefined;
@@ -143,6 +143,15 @@ test.skipIf(vsixFromEnvironment === undefined)(
       await readFile(join(repositoryRoot, "package.json"), "utf8"),
     ) as { name: string; publisher: string; version: string };
     const expectedExtensionId = `${manifest.publisher}.${manifest.name}`;
+    let installSource: string;
+    if (marketplaceInstallation) {
+      installSource = `${expectedExtensionId}@${manifest.version}`;
+    } else if (vsixFromEnvironment !== undefined) {
+      installSource = resolve(vsixFromEnvironment);
+      expect(existsSync(installSource), `${installSource} must exist`).toBe(true);
+    } else {
+      throw new Error("TOMLSMITH_VSIX_E2E or TOMLSMITH_MARKETPLACE_E2E is required");
+    }
 
     const temporaryRoot = await mkdtemp(join(tmpdir(), "tomlsmith-vscode-e2e-"));
     try {
@@ -247,18 +256,19 @@ test.skipIf(vsixFromEnvironment === undefined)(
           ...cliPrefixArguments,
           ...profileArguments,
           "--install-extension",
-          vsixPath,
+          installSource,
           "--force",
         ],
         {
           encoding: "utf8",
           shell: process.platform === "win32",
+          timeout: 120_000,
         },
       );
       expect(install.error).toBeUndefined();
       expect(
         install.status,
-        `VSIX installation failed:\n${install.stdout}\n${install.stderr}`,
+        `Installation of ${installSource} failed:\n${install.stdout}\n${install.stderr}`,
       ).toBe(0);
 
       const installed = spawnSync(
@@ -397,6 +407,29 @@ test.skipIf(vsixFromEnvironment === undefined)(
         );
       } else {
         expect(report.serverPath).toBe(externalServerPath);
+      }
+      const serverPackage = JSON.parse(
+        await readFile(join(repositoryRoot, "server-package.json"), "utf8"),
+      ) as { version: string };
+      const serverVersion = spawnSync(report.serverPath, ["--version"], {
+        encoding: "utf8",
+        timeout: 10_000,
+      });
+      expect(serverVersion.error).toBeUndefined();
+      expect(serverVersion.status, serverVersion.stderr).toBe(0);
+      expect(serverVersion.stdout.trim()).toBe(`tomlsmith-lsp ${serverPackage.version}`);
+
+      const resultPath = process.env.TOMLSMITH_E2E_RESULT_PATH;
+      if (resultPath !== undefined) {
+        const destination = resolve(resultPath);
+        await mkdir(dirname(destination), { recursive: true });
+        await writeFile(destination, `${JSON.stringify({
+          passed: true,
+          installSource,
+          installedExtensions: installed.stdout.trim().split(/\r?\n/u),
+          serverVersion: serverVersion.stdout.trim(),
+          ...report,
+        }, null, 2)}\n`, "utf8");
       }
     } finally {
       await rm(temporaryRoot, { recursive: true, force: true });
